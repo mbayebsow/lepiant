@@ -1,0 +1,10 @@
+{
+  "name": "lepiant",
+  "displayName": "L'épiant",
+  "ios": {
+    "supportsTablet": true,
+    "infoPlist": {
+      "UIBackgroundModes": ["audio"]
+    }
+  }
+}
