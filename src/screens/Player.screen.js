@@ -6,9 +6,10 @@ import useStyles from "../hook/useStyle";
 import usePlayer from "../hook/usePlayer";
 import LinearGradient from "react-native-linear-gradient";
 import { Airplay, CassetteTape, Cast, Heart, Shuffle, Timer } from "lucide-react-native";
+import RadioButtonLike from "../components/radios/RadioButtonLike";
 
 export default function PlayerScreen() {
-  const { averageColor } = usePlayer();
+  const { averageColor, currentSong } = usePlayer();
   const { backgroundColorLight, backgroundColor } = useStyles();
 
   return (
@@ -77,7 +78,7 @@ export default function PlayerScreen() {
               }}
             >
               <PlayerName customColor="white" />
-              <Heart size={20} color="white" fill="white" />
+              {currentSong?.id && <RadioButtonLike id={currentSong.id} color="white" />}
             </View>
 
             <View

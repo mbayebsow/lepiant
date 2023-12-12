@@ -1,6 +1,7 @@
 import { Pressable } from "react-native";
 import { ImageDown } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
+import { trigger } from "react-native-haptic-feedback";
 
 export default function ArticleShareButton({ article }) {
   const navigation = useNavigation();
@@ -8,7 +9,10 @@ export default function ArticleShareButton({ article }) {
   return (
     <>
       <Pressable
-        onPress={() => navigation.navigate("SharArticle", article)}
+        onPress={() => {
+          navigation.navigate("SharArticle", article);
+          trigger("impactLight");
+        }}
         style={{
           display: "flex",
           flexDirection: "row",

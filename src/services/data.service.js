@@ -21,33 +21,20 @@ const fetchData = async (url) => {
 };
 
 export const getQuotidiens = async () => {
-  // await removeDataOnStore('quotidiens');
-  let response;
   let url = "https://cdn.teldoo.site/api/content/lepiant/quotidiens?$top=1";
+  const quotidien = await fetchData(url);
+  //const dataOnStore = await getDataOnStore("quotidiens");
 
-  const dataOnStore = await getDataOnStore("quotidiens");
+  if (!quotidien) return null;
 
-  if (dataOnStore) {
-    const parsedData = JSON.parse(dataOnStore);
-    const diff = moment().diff(parsedData.addedTime, "minutes");
-
-    if (diff >= 1440 || diff === 0) {
-      response = await fetchData(url);
-    } else {
-      return parsedData;
-    }
-  } else {
-    response = await fetchData(url);
-  }
-  if (!response) return null;
-
-  const strucResponse = {
+  const structQuotidien = {
     addedTime: new Date(),
-    createdTime: response.items[0].created,
-    files: response.items[0].data.files.iv,
+    createdTime: quotidien.items[0].created,
+    files: quotidien.items[0].data.files.iv,
   };
-  await setDataOnStore("quotidiens", JSON.stringify(strucResponse));
-  return strucResponse;
+
+  await setDataOnStore("quotidiens", JSON.stringify(structQuotidien));
+  return structQuotidien;
 };
 
 export const getRevues = async () => {

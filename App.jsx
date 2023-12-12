@@ -32,7 +32,7 @@ function App() {
   const [finish, setFinish] = useState(false);
   const { getUserSession, userData } = useSession();
   const { setRevues, setTopNews } = useData();
-  const { setRadios } = useRadio();
+  const { initRadio } = useRadio();
   const { setQuotidiens } = useQuotidien();
   const { isTrackPlayerInit, initializeTrackPlayer } = usePlayer();
   const { getArticlesByCategory, getRandomArticles, setCategories } = useArticle();
@@ -44,7 +44,7 @@ function App() {
     await setCategories();
     await setTopNews();
     await setRevues();
-    await setRadios();
+    await initRadio();
     await setQuotidiens();
     setReady(true);
   };

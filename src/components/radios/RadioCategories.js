@@ -1,13 +1,16 @@
-import useStyles from "../../hook/useStyle";
 import { Pressable, Text } from "react-native";
+import useStyles from "../../hook/useStyle";
+import useRadio from "../../hook/useRadio";
 
-export default function RadioCategories({ title = "-", active = false, setSearchRadio }) {
+export default function RadioCategories({ title = "-" }) {
+  const { filterByCategory, categorySelect } = useRadio();
   const { color, backgroundColorLight, primaryColor } = useStyles();
+
   return (
     <Pressable
-      onPress={() => setSearchRadio(title)}
+      onPress={() => filterByCategory(title)}
       style={{
-        backgroundColor: active ? primaryColor : backgroundColorLight,
+        backgroundColor: categorySelect === title ? primaryColor : backgroundColorLight,
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 7,
@@ -15,7 +18,7 @@ export default function RadioCategories({ title = "-", active = false, setSearch
     >
       <Text
         style={{
-          color: active ? "white" : color,
+          color: categorySelect === title ? "white" : color,
         }}
       >
         {title}

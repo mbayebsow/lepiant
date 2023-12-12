@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { Text, View, Pressable, ScrollView, TextInput } from "react-native";
+import { useEffect } from "react";
+import { View, ScrollView, TextInput, ActivityIndicator } from "react-native";
 
-import usePlayer from "../hook/usePlayer";
 import TabLayout from "../components/layout/TabLayout";
 import useStyles from "../hook/useStyle";
 import RadioCard from "../components/radios/RadioCard";
@@ -10,38 +9,12 @@ import useRadio from "../hook/useRadio";
 
 export default function RadioScreen() {
   const { backgroundColorLight } = useStyles();
-  const { setFiles, preloadAudio } = usePlayer();
-  const { radios } = useRadio();
-
-  const [searchRadio, setSearchRadio] = useState();
-  const [filterRadio, setFilterRadio] = useState();
-  const [categories, setCategories] = useState();
-
-  async function filtrerParCategories() {
-    if (!radios) return;
-    const resul = radios.filter((item) => item.categories === searchRadio);
-    setFilterRadio(resul);
-  }
-
-  async function extraireCategoriesUniques() {
-    if (!radios) return;
-    const categories = radios.map((item) => item.categories);
-    const categoriesUniques = [...new Set(categories)];
-    setCategories(categoriesUniques);
-    setSearchRadio("Senegal");
-  }
+  const { filterResult, categories, filterByCategory } = useRadio();
 
   useEffect(() => {
-    filtrerParCategories();
-  }, [radios, searchRadio]);
-
-  useEffect(() => {
-    setFiles(filterRadio);
-  }, [radios, filterRadio]);
-
-  useEffect(() => {
-    extraireCategoriesUniques();
-  }, [radios]);
+    filterByCategory("Senegal");
+    console.log("render radio screen");
+  }, []);
 
   return (
     <TabLayout>
@@ -54,32 +27,27 @@ export default function RadioScreen() {
               borderRadius: 10,
               height: 45,
             }}
-            //value={"dddd"}
             placeholder="Recherche"
             keyboardType="numeric"
           />
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 10,
-              paddingHorizontal: 12,
-            }}
-          >
-            {categories
-              ? categories.map((categorie, i) => (
-                  <RadioCategories
-                    key={i}
-                    title={categorie}
-                    active={searchRadio === categorie}
-                    setSearchRadio={setSearchRadio}
-                  />
-                ))
-              : null}
-          </View>
-        </ScrollView>
+
+        <View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 10,
+                paddingHorizontal: 12,
+              }}
+            >
+              {categories
+                ? categories.map((category, i) => <RadioCategories key={i} title={category} />)
+                : null}
+            </View>
+          </ScrollView>
+        </View>
 
         <View
           style={{
@@ -92,8 +60,8 @@ export default function RadioScreen() {
             marginTop: 5,
           }}
         >
-          {filterRadio &&
-            filterRadio.map((radio, i) => (
+          {filterResult.length > 0 ? (
+            filterResult.map((radio, i) => (
               <View key={i} style={{ width: "48%" }}>
                 <RadioCard
                   index={i}
@@ -101,10 +69,21 @@ export default function RadioScreen() {
                   name={radio.name}
                   category={radio.categories}
                   image={radio.image}
-                  preloadAudio={preloadAudio}
                 />
               </View>
-            ))}
+            ))
+          ) : (
+            <View
+              style={{
+                width: "100%",
+                height: "100%",
+                justifyContent: "center",
+                display: "flex",
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          )}
         </View>
       </View>
     </TabLayout>

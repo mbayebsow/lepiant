@@ -1,10 +1,12 @@
-import useStyles from "../../hook/useStyle";
 import { Pressable, Text, View } from "react-native";
+import useStyles from "../../hook/useStyle";
 import ImageComponent from "../Image.component";
-import { Heart } from "lucide-react-native";
+import usePlayer from "../../hook/usePlayer";
+import RadioButtonLike from "./RadioButtonLike";
 
-export default function RadioCard({ index, id, name, category, image, preloadAudio }) {
-  const { color, backgroundColorLight, primaryColor } = useStyles();
+export default function RadioCard({ index, id, name, category, image }) {
+  const { color, backgroundColorLight } = useStyles();
+  const { preloadAudio } = usePlayer();
 
   return (
     <View
@@ -38,12 +40,10 @@ export default function RadioCard({ index, id, name, category, image, preloadAud
         }}
       >
         <View>
-          <Text style={{ fontSize: 15, fontWeight: 500, color }}>{name}</Text>
+          <Text style={{ fontSize: 15, fontWeight: "bold", color }}>{name}</Text>
           <Text style={{ opacity: 0.5, color }}>{category}</Text>
         </View>
-        <Pressable>
-          <Heart size={20} color={primaryColor} />
-        </Pressable>
+        <RadioButtonLike id={id} />
       </View>
     </View>
   );
