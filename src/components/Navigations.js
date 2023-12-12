@@ -15,6 +15,7 @@ import ArticleScreen from "../screens/Article.screen";
 import ChainesScreen from "../screens/Chaines.screen";
 import ProfileEditScreen from "../screens/ProfileEdit.screen";
 import ShareArticleScreen from "../screens/ShareArticle.screen";
+import LoginScreen from "../screens/Login.screen";
 
 import useStyles from "../hook/useStyle";
 
@@ -40,6 +41,7 @@ function TabNavigation() {
         swipeEnabled: true,
         tabBarActiveTintColor: primaryColor,
         tabBarInactiveTintColor: colorLight,
+        headerShadowVisible: false,
         tabBarStyle: {
           backgroundColor,
         },
@@ -96,6 +98,7 @@ function RootNavigation() {
       <RootStack.Navigator
         screenOptions={() => ({
           headerBackTitleVisible: false,
+          headerShadowVisible: false,
           headerTitleAlign: "left",
           headerTintColor: primaryColor,
           headerTitleStyle: { color },
@@ -114,31 +117,13 @@ function RootNavigation() {
           <RootStack.Screen name="Quotidien" component={QuotidienScreen} />
           <RootStack.Screen name="Article" component={ArticleScreen} />
           <RootStack.Screen name="Chaines" component={ChainesScreen} />
-          <RootStack.Screen
-            name="Profile"
-            options={{
-              headerBackTitleVisible: false,
-              headerShadowVisible: false,
-              headerStyle: {
-                backgroundColor: backgroundColorLight,
-              },
-            }}
-            component={ProfileScreen}
-          />
+          <RootStack.Screen name="Profile" component={ProfileScreen} />
         </RootStack.Group>
 
-        <RootStack.Group
-          screenOptions={{
-            presentation: "modal",
-            headerBackTitleVisible: false,
-          }}
-        >
+        <RootStack.Group screenOptions={{ presentation: "modal" }} >
           <RootStack.Screen name="ProfileEdit" component={ProfileEditScreen} />
-          <RootStack.Screen
-            name="Player"
-            component={PlayerScreen}
-            options={{ headerShown: false }}
-          />
+          <RootStack.Screen name="Login" component={LoginScreen} />
+          <RootStack.Screen name="Player" component={PlayerScreen} options={{ headerShown: false }} />
           <RootStack.Screen
             name="SharArticle"
             component={ShareArticleScreen}

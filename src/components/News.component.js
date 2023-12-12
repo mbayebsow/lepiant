@@ -9,12 +9,16 @@ import useArticle from "../hook/useArticle";
 import useChannel from "../hook/useChannel";
 import ImageComponent from "./Image.component";
 import useStyles from "../hook/useStyle";
+import useSession from "../hook/useSession";
 
 function ArticleCategories({ id, title, active, getArticlesByCategory }) {
+  const navigation = useNavigation()
+  const { isLogin } = useSession()
   const { backgroundColorLight, primaryColor, color } = useStyles();
+
   return (
     <Pressable
-      onPress={() => getArticlesByCategory(id)}
+      onPress={() => isLogin ? getArticlesByCategory(id) : navigation.navigate("Login")}
       style={{
         backgroundColor: active ? primaryColor : backgroundColorLight,
         paddingHorizontal: 10,

@@ -6,8 +6,11 @@ import HeaderSection from "./HeaderSection";
 import { Plus } from "lucide-react-native";
 import ImageComponent from "./Image.component";
 import useStyles from "../hook/useStyle";
+import useSession from "../hook/useSession";
 
 function ChannelItem({ id, name, logo, viewType }) {
+  const { isLogin } = useSession()
+  const navigation = useNavigation();
   const { backgroundColor, backgroundColorLight, color } = useStyles();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { subscribedChannel, toggleSubscribe, loading } = useChannel();
@@ -63,7 +66,7 @@ function ChannelItem({ id, name, logo, viewType }) {
         {name}
       </Text>
       <Pressable
-        onPress={() => toggleSubscribe(id)}
+        onPress={() => isLogin ? toggleSubscribe(id) : navigation.navigate("Login")}
         style={{
           backgroundColor: isSubscribed ? "#f8ccd221" : "#eb445a21",
           width: viewType === "card" ? "100%" : 100,

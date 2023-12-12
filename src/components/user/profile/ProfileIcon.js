@@ -1,11 +1,13 @@
-import { Image, Pressable, Buton } from "react-native";
+import { Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import useSession from "../../../hook/useSession";
 
 export default function ProfileIcon() {
   const navigation = useNavigation();
+  const { isLogin } = useSession()
   return (
     <Pressable
-      onPress={() => navigation.navigate("Profile")}
+      onPress={() => navigation.navigate(isLogin ? "Profile" : "Login")}
       style={{
         backgroundColor: "#ffc48c",
         display: "flex",

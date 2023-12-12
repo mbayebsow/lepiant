@@ -1,12 +1,14 @@
-import { Text, View, Pressable, TextInput } from "react-native";
-import useStyles from "../../hook/useStyle";
+import { Text, View, Pressable, TextInput, ScrollView } from "react-native";
 import { LogIn } from "lucide-react-native";
-import useSession from "../../hook/useSession";
-import Input from "../ui/Input";
-import PrimaryBouton from "../ui/PrimaryBouton";
+import Input from "../components/ui/Input";
+import PrimaryBouton from "../components/ui/PrimaryBouton";
+import useStyles from "../hook/useStyle";
+import useSession from "../hook/useSession";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
 function LoginStep() {
-  const { backgroundColor } = useStyles();
+  const { backgroundColorLight } = useStyles();
   const { loading, userVerifyMail } = useSession();
   let email;
 
@@ -16,8 +18,10 @@ function LoginStep() {
         width: "100%",
         padding: 12,
         marginTop: 100,
-        backgroundColor,
+        backgroundColor: backgroundColorLight,
         borderRadius: 12,
+        borderColor: backgroundColorLight,
+        borderWidth: 1
       }}
     >
       <View style={{ padding: 12, width: "100%", marginVertical: 10 }}>
@@ -45,7 +49,7 @@ function LoginStep() {
 }
 
 function OtpStep() {
-  const { backgroundColor, backgroundColorLight, inputStyle, color, primaryColor, secondaryColor } =
+  const { backgroundColorLight, inputStyle, color, primaryColor, secondaryColor } =
     useStyles();
   const { loading, userVerifyOTP, setStepLogin } = useSession();
   let code;
@@ -57,7 +61,7 @@ function OtpStep() {
           width: "100%",
           padding: 12,
           marginTop: 100,
-          backgroundColor,
+          backgroundColor: backgroundColorLight,
           borderRadius: 12,
         }}
       >
@@ -70,7 +74,6 @@ function OtpStep() {
           <TextInput
             style={{
               ...inputStyle,
-              backgroundColor: backgroundColorLight,
               color,
             }}
             keyboardType="number-pad"
@@ -95,7 +98,23 @@ function OtpStep() {
   );
 }
 
-export default function Login() {
-  const { stepLogin } = useSession();
-  return stepLogin === 1 ? <LoginStep /> : <OtpStep />;
+export default function LoginScreen() {
+  const navigation = useNavigation()
+  const { isLogin, stepLogin } = useSession();
+
+  useEffect(() => {
+    if (isLogin) navigation.navigate("Profile")
+
+  }, [isLogin])
+
+  return (
+    <ScrollView
+      style={{
+        height: "100%",
+        padding: 25,
+      }}
+    >
+      {stepLogin === 1 ? <LoginStep /> : <OtpStep />}
+    </ScrollView>
+  );
 }

@@ -19,39 +19,39 @@ const Store = createStore({
   actions: {
     setLogin:
       (isLogin) =>
-      ({ setState }) => {
-        setState({
-          isLogin,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            isLogin,
+          });
+        },
     setUserData:
       (userData) =>
-      ({ setState }) => {
-        setState({
-          userData,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            userData,
+          });
+        },
     setStepLogin:
       (step) =>
-      ({ setState }) => {
-        setState({
-          stepLogin: step,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            stepLogin: step,
+          });
+        },
     setLoading:
       (loading) =>
-      ({ setState }) => {
-        setState({
-          loading,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            loading,
+          });
+        },
     setOpenLogin:
       (openLogin) =>
-      ({ setState }) => {
-        setState({
-          openLogin,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            openLogin,
+          });
+        },
   },
 });
 
