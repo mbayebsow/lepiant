@@ -1,3 +1,4 @@
+import moment from "moment/moment";
 import { useEffect, useState } from "react";
 import { View, Dimensions, SafeAreaView, ScrollView, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -15,13 +16,15 @@ export default function QuotidienScreen() {
   const { quotidiens, qIndex, setQIndex } = useQuotidien();
   const [averageColor, setAverageColor] = useState(null);
 
+
   const getColor = async (image) => {
     const color = await ColorExtractor(image);
     if (color?.success) setAverageColor(color.color);
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: "CPQ de 11/11/2023" });
+    let qDay = moment(quotidiens.createdTime).format('dddd DD MMMM')
+    navigation.setOptions({ title: quotidiens ? `CPQ du ${qDay}` : "" });
   }, []);
 
   useEffect(() => {
@@ -57,6 +60,8 @@ export default function QuotidienScreen() {
             style={{
               flexDirection: "row",
               alignItems: "center",
+              gap: 5,
+              padding: 7
             }}
           >
             {quotidiens.files.map((quotidien, i) => (
@@ -66,8 +71,8 @@ export default function QuotidienScreen() {
                 style={{
                   height: "100%",
                   width: "auto",
-                  aspectRatio: 3 / 4,
-                  borderWidth: qIndex === i ? 5 : 0,
+                  aspectRatio: 3 / 4.5,
+                  borderWidth: qIndex === i ? 2 : 0,
                   borderColor: "red",
                 }}
               >

@@ -9,6 +9,8 @@ export default function Input({
   DataDetectorTypes,
   placeholder,
   onChangeText,
+  textContentType,
+  autoCompleteType
 }) {
   const { inputStyle } = useStyles();
   return (
@@ -22,6 +24,9 @@ export default function Input({
         DataDetectorTypes={DataDetectorTypes}
         placeholder={placeholder}
         onChangeText={onChangeText}
+        textContentType={textContentType}
+        autoCompleteType={autoCompleteType}
+        autoCorrect={true}
       />
     </>
   );

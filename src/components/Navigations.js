@@ -1,5 +1,5 @@
-import { Image } from "react-native";
-import { Newspaper, BoomBox, Library } from "lucide-react-native";
+import { Image, View } from "react-native";
+import { Newspaper, BoomBox, Library, X, ChevronLeft } from "lucide-react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
@@ -79,7 +79,7 @@ function TabNavigation() {
 }
 
 function RootNavigation() {
-  const { backgroundColor, backgroundColorLight, primaryColor, color, colorLight } = useStyles();
+  const { backgroundColor, backgroundColorLight, primaryColor, color, colorLight, primaryColor10 } = useStyles();
 
   const Theme = {
     dark: true,
@@ -104,6 +104,11 @@ function RootNavigation() {
           headerTitleStyle: { color },
           headerStyle: { backgroundColor, height: 100 },
           headerLeftContainerStyle: { paddingLeft: 10 },
+          headerBackImage: () => (
+            <View style={{ backgroundColor: primaryColor10, padding: 5, borderRadius: 100 }}>
+              <ChevronLeft color={primaryColor} size={24} />
+            </View>
+          ),
         })}
       >
         <RootStack.Group>
@@ -117,10 +122,20 @@ function RootNavigation() {
           <RootStack.Screen name="Quotidien" component={QuotidienScreen} />
           <RootStack.Screen name="Article" component={ArticleScreen} />
           <RootStack.Screen name="Chaines" component={ChainesScreen} />
-          <RootStack.Screen name="Profile" component={ProfileScreen} />
         </RootStack.Group>
 
-        <RootStack.Group screenOptions={{ presentation: "modal" }} >
+        <RootStack.Group
+          screenOptions={{
+            presentation: "modal",
+            headerTitle: '',
+            headerBackImage: () => (
+              <View style={{ backgroundColor: primaryColor10, padding: 5, borderRadius: 100 }}>
+                <X color={primaryColor} size={24} />
+              </View>
+            ),
+          }}
+        >
+          <RootStack.Screen name="Profile" component={ProfileScreen} options={{ headerStyle: { backgroundColor: backgroundColorLight } }} />
           <RootStack.Screen name="ProfileEdit" component={ProfileEditScreen} />
           <RootStack.Screen name="Login" component={LoginScreen} />
           <RootStack.Screen name="Player" component={PlayerScreen} options={{ headerShown: false }} />

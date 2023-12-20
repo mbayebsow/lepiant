@@ -57,6 +57,7 @@ const Store = createStore({
 
 export default function useSession() {
   const loginStore = createHook(Store);
+
   const [
     { isLogin, userData, stepLogin, loading, openLogin },
     { setLoading, setLogin, setUserData, setStepLogin, setOpenLogin },
@@ -72,31 +73,32 @@ export default function useSession() {
           body: JSON.stringify({ login: email }),
         };
 
-        const login = await fetch("https://lepiant-login.deno.dev/login", options)
+        const login = await fetch("https://lepiant-api.cyclic.app/session/login", options)
           .then((response) => response.json())
           .catch((err) => console.error(err));
 
         if (login?.success) {
           setStepLogin(2);
           setLoading(false);
-          alert("Un code de vérification a été envoyé. Vérifiez vos mails.");
+          Toast.show("Un code de vérification a été envoyé. Vérifiez vos mails.");
         } else {
           setLoading(false);
-          alert("Une erreur a eu lieu. Veuillez réessayer plus tard.");
+          Toast.show("Une erreur a eu lieu. Veuillez réessayer plus tard.");
         }
       } else {
         setLoading(false);
-        alert("L'adresse e-mail n'est pas valide !");
+        Toast.show("L'adresse e-mail n'est pas valide !");
       }
     } else {
       setLoading(false);
-      alert("Veuillez entrer une adresse e-mail, s'il vous plaît.");
+      Toast.show("Veuillez entrer une adresse e-mail, s'il vous plaît.");
     }
   };
 
   const userVerifyOTP = async (inputCode) => {
-    if (inputCode.length !== 6) {
-      alert("Le code doit comporter 6 chiffres.");
+
+    if (inputCode?.length !== 6) {
+      Toast.show("Le code doit comporter 6 chiffres.");
       return;
     }
 
@@ -108,58 +110,81 @@ export default function useSession() {
         body: JSON.stringify({ code: inputCode }),
       };
 
-      const user = await fetch("https://lepiant-login.deno.dev/verifyOTP", options).then(
+      const user = await fetch("https://lepiant-api.cyclic.app/session/verify", options).then(
         (response) => response.json()
       );
 
       if (!user) {
-        alert("Une erreur s'est produite");
+        Toast.show("Une erreur s'est produite");
         setLoading(false);
         return;
       }
 
       if (user?.success) {
-        await setDataOnStore("userSession", JSON.stringify(user.user));
+        await setDataOnStore("userToken", JSON.stringify(user.token));
         setLoading(false);
         getUserSession();
       } else {
-        alert("Code non valide!");
+        Toast.show("Code non valide!");
         setLoading(false);
       }
     } else {
-      alert("Entrez un code valide.");
+      Toast.show("Entrez un code valide.");
       setLoading(false);
     }
   };
 
   const getUserSession = async () => {
-    const dataOnStore = await getDataOnStore("userSession");
+    const Token = await getDataOnStore("userToken");
 
-    if (!dataOnStore) return;
-    const user = JSON.parse(dataOnStore);
-    if (!user.id) return;
+    if (!Token) return;
 
-    setUserData(user);
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(Token)}`
+      }
+    };
+
+    const user = await fetch('https://lepiant-api.cyclic.app/content/user/me', options)
+      .then(response => response.json())
+      .catch(err => {
+        console.log(err);
+        return null
+      });
+
+    if (!user?.success) return;
+
+    setUserData(user.user);
     setLogin(true);
   };
 
   const updateUserSession = async (data) => {
+    console.log(data);
     setLoading(true);
+
+    const Token = await getDataOnStore("userToken");
+
+
+    if (!Token) return;
+
 
     const options = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${JSON.parse(Token)}` },
       body: JSON.stringify(data),
     };
 
-    const user = await fetch(`https://lepiant-login.deno.dev/updateUser/${userData.id}`, options)
+    const user = await fetch("https://lepiant-api.cyclic.app/content/user/update", options)
       .then((response) => response.json())
-      .then((response) => response)
-      .catch((err) => console.error(err));
+      .catch((err) => null);
+
+
+    console.log(user);
 
     if (user?.success) {
-      setUserData(user.user);
-      await updateDataOnStore("userSession", JSON.stringify(user.user));
+      await setDataOnStore("userToken", JSON.stringify(user.token));
+      await getUserSession()
     }
     Toast.show("Données mises à jour avec succès.");
     setLoading(false);

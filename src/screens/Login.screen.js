@@ -5,12 +5,12 @@ import PrimaryBouton from "../components/ui/PrimaryBouton";
 import useStyles from "../hook/useStyle";
 import useSession from "../hook/useSession";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function LoginStep() {
   const { backgroundColorLight } = useStyles();
   const { loading, userVerifyMail } = useSession();
-  let email;
+  const [loginMail, setLoginMail] = useState()
 
   return (
     <View
@@ -29,10 +29,14 @@ function LoginStep() {
       </View>
       <View style={{ padding: 12, width: "100%" }}>
         <Input
-          value={email}
+          //value={loginMail}
+          label="E-mail"
           keyboardType="email-address"
           placeholder="Votre adresse email"
-          onChangeText={(e) => (email = e)}
+          textContentType="emailAddress"
+          autoCompleteType="email"
+          autoCorrect={true}
+          onChangeText={(e) => setLoginMail(e)}
         />
       </View>
 
@@ -40,7 +44,7 @@ function LoginStep() {
         <PrimaryBouton
           text="Se connecter"
           icon={<LogIn color="white" size={20} />}
-          onPress={() => userVerifyMail(email)}
+          onPress={() => userVerifyMail(loginMail)}
           loading={loading}
         />
       </View>
@@ -49,10 +53,11 @@ function LoginStep() {
 }
 
 function OtpStep() {
-  const { backgroundColorLight, inputStyle, color, primaryColor, secondaryColor } =
-    useStyles();
+  const navigation = useNavigation()
+  const { backgroundColorLight, primaryColor } = useStyles();
   const { loading, userVerifyOTP, setStepLogin } = useSession();
-  let code;
+  const [otpCode, setOtpCode] = useState()
+
 
   return (
     <>
@@ -71,14 +76,15 @@ function OtpStep() {
           </Text>
         </View>
         <View style={{ padding: 12, width: "100%" }}>
-          <TextInput
-            style={{
-              ...inputStyle,
-              color,
-            }}
+
+          <Input
+            //value={loginMail}
+            label="Code"
             keyboardType="number-pad"
             placeholder="Code de verification"
-            onChangeText={(e) => (code = e)}
+            textContentType="oneTimeCode"
+            autoComplete="sms-otp"
+            onChangeText={(e) => setOtpCode(e)}
           />
         </View>
 
@@ -86,7 +92,10 @@ function OtpStep() {
           <PrimaryBouton
             text="Verifier"
             icon={<LogIn color="white" size={20} />}
-            onPress={() => userVerifyOTP(code)}
+            onPress={async () => {
+              await userVerifyOTP(otpCode)
+              navigation.goBack()
+            }}
             loading={loading}
           />
         </View>
