@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import useChannel from "../hook/useChannel";
-import HeaderSection from "./HeaderSection";
 import { Plus } from "lucide-react-native";
 import ImageComponent from "./Image.component";
 import useStyles from "../hook/useStyle";
 import useSession from "../hook/useSession";
 
-function ChannelItem({ id, name, logo, viewType }) {
+function ChannelItem({ channel, viewType }) {
+  const { id, name, logo } = channel
   const { isLogin } = useSession()
   const navigation = useNavigation();
   const { backgroundColor, backgroundColorLight, color } = useStyles();
@@ -32,6 +32,7 @@ function ChannelItem({ id, name, logo, viewType }) {
         display: "flex",
         flexDirection: viewType === "card" ? "column" : "row",
         alignItems: "center",
+        justifyContent: "space-between",
         borderBottomWidth: viewType === "card" ? 0 : 1,
         borderColor: backgroundColorLight,
         gap: 7,
@@ -44,27 +45,39 @@ function ChannelItem({ id, name, logo, viewType }) {
         shadowRadius: 5.62,
       }}
     >
-      <View
+      <Pressable
+        onPress={() => navigation.navigate("Chaine", channel)}
         style={{
-          width: viewType === "card" ? 70 : 50,
-          height: "auto",
-          borderRadius: 100,
-          aspectRatio: 1 / 1,
-          overflow: "hidden",
+          display: "flex",
+          flexDirection: viewType === "card" ? "column" : "row",
+          alignItems: "center",
+          width: "auto",
+          gap: 7,
+          height: null
         }}
       >
-        <ImageComponent image={logo} />
-      </View>
-      <Text
-        style={{
-          flex: 1,
-          textAlign: viewType === "card" ? "center" : "left",
-          color,
-        }}
-        numberOfLines={1}
-      >
-        {name}
-      </Text>
+        <View
+          style={{
+            width: viewType === "card" ? 70 : 50,
+            height: "auto",
+            borderRadius: 100,
+            aspectRatio: 1 / 1,
+            overflow: "hidden",
+          }}
+        >
+          <ImageComponent image={logo} />
+        </View>
+        <Text
+          style={{
+            textAlign: viewType === "card" ? "center" : "left",
+            color,
+          }}
+          numberOfLines={1}
+        >
+          {name}
+        </Text>
+      </Pressable>
+
       <Pressable
         onPress={() => isLogin ? toggleSubscribe(id) : navigation.navigate("Login")}
         style={{
@@ -116,7 +129,6 @@ export default function Channels({ items = null, viewType = "card" | "list" }) {
 
   return (
     <View>
-      <HeaderSection title="Chaînes" />
       <ScrollView horizontal={viewType === "card"} showsHorizontalScrollIndicator={false}>
         <View
           style={{
@@ -133,9 +145,7 @@ export default function Channels({ items = null, viewType = "card" | "list" }) {
               .map((channel, i) => (
                 <View key={i}>
                   <ChannelItem
-                    id={channel.id}
-                    name={channel.name}
-                    logo={channel.logo}
+                    channel={channel}
                     viewType={viewType}
                   />
                 </View>

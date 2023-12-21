@@ -1,4 +1,4 @@
-import { Image, View } from "react-native";
+import { View } from "react-native";
 import { Newspaper, BoomBox, Library, X, ChevronLeft } from "lucide-react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -10,28 +10,18 @@ import RadioScreen from "../screens/Radios.screen";
 import ProfileScreen from "../screens/Profile.screen";
 import LibraryScreen from "../screens/Library.screen";
 import PlayerScreen from "../screens/Player.screen";
-import ProfileIcon from "./user/profile/ProfileIcon";
 import ArticleScreen from "../screens/Article.screen";
-import ChainesScreen from "../screens/Chaines.screen";
+import ChannelsScreen from "../screens/Channels.screen";
 import ProfileEditScreen from "../screens/ProfileEdit.screen";
 import ShareArticleScreen from "../screens/ShareArticle.screen";
 import LoginScreen from "../screens/Login.screen";
+import ChannelScreen from "../screens/Channel.screen";
 
 import useStyles from "../hook/useStyle";
 
 const TabStack = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 
-function LogoTitle() {
-  return (
-    <Image
-      style={{ width: 80, height: 30 }}
-      source={{
-        uri: "https://cdn.teldoo.site/api/assets/lepiant/74ab464b-5a37-4c68-a933-fefc957ee75a/l-e-piant.png?version=0",
-      }}
-    />
-  );
-}
 
 function TabNavigation() {
   const { backgroundColor, primaryColor, colorLight } = useStyles();
@@ -45,18 +35,13 @@ function TabNavigation() {
         tabBarStyle: {
           backgroundColor,
         },
-        headerRight: () => <ProfileIcon />,
-        headerStyle: {
-          backgroundColor,
-        },
+        headerShown: false
       })}
     >
       <TabStack.Screen
         name="Actualités"
         component={NewsScreen}
         options={{
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
           tabBarIcon: ({ color, size }) => <Newspaper color={color} size={size} />,
         }}
       />
@@ -97,6 +82,7 @@ function RootNavigation() {
     <NavigationContainer theme={Theme}>
       <RootStack.Navigator
         screenOptions={() => ({
+          headerTitle: '',
           headerBackTitleVisible: false,
           headerShadowVisible: false,
           headerTitleAlign: "left",
@@ -112,16 +98,11 @@ function RootNavigation() {
         })}
       >
         <RootStack.Group>
-          <RootStack.Screen
-            name="Accueil"
-            component={TabNavigation}
-            options={() => ({
-              headerShown: false,
-            })}
-          />
+          <RootStack.Screen name="Accueil" component={TabNavigation} options={() => ({ headerShown: false })} />
           <RootStack.Screen name="Quotidien" component={QuotidienScreen} />
           <RootStack.Screen name="Article" component={ArticleScreen} />
-          <RootStack.Screen name="Chaines" component={ChainesScreen} />
+          <RootStack.Screen name="Chaines" component={ChannelsScreen} />
+          <RootStack.Screen name="Chaine" component={ChannelScreen} options={() => ({ headerShown: false })} />
         </RootStack.Group>
 
         <RootStack.Group

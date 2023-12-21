@@ -1,14 +1,6 @@
 import moment from "moment/moment";
 import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  useWindowDimensions,
-  Pressable,
-  Image,
-} from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, useWindowDimensions, Pressable, Image, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import RenderHtml, { HTMLElementModel, HTMLContentModel } from "react-native-render-html";
 import useArticle from "../hook/useArticle";
@@ -55,8 +47,9 @@ const customHTMLElementModels = {
   }),
 };
 
-function TextZoom({ textZoom, setTextZoom }) {
+function TextZoom() {
   const { backgroundColorLight, color } = useStyles();
+  const { textZoom, setTextZoom } = useArticle();
 
   return (
     <View
@@ -111,6 +104,36 @@ function TextZoom({ textZoom, setTextZoom }) {
   );
 }
 
+function HeaderActions() {
+  const { primaryColor10 } = useStyles();
+  const { openArticleViewerDetails } = useArticle();
+
+  return (
+    <View
+      style={{
+        marginRight: 12,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+      }}
+    >
+      <TextZoom />
+
+      <View
+        style={{
+          backgroundColor: primaryColor10,
+          borderRadius: 100,
+          width: 35,
+          height: 35,
+        }}
+      >
+        <ArticleShareButton article={openArticleViewerDetails} />
+      </View>
+    </View>
+  )
+}
+
 function ChannelLogo({ image }) {
   return (
     <Image
@@ -125,11 +148,10 @@ function ChannelLogo({ image }) {
 export default function ArticleScreen() {
   const navigation = useNavigation();
   const [article, setArticle] = useState(null);
-  const [textZoom, setTextZoom] = useState(1);
-  const { openArticleViewerDetails } = useArticle();
+  const { openArticleViewerDetails, textZoom } = useArticle();
   const { getChannelsDetails } = useChannel();
   const { width } = useWindowDimensions();
-  const { backgroundColor, color, primaryColor10, backgroundColorLight } = useStyles();
+  const { backgroundColor, color, backgroundColorLight } = useStyles();
 
   const tagsStyles = {
     p: {
@@ -184,58 +206,29 @@ export default function ArticleScreen() {
     },
   };
 
-  const getChannelDetail = async () => {
-    const channel = getChannelsDetails(openArticleViewerDetails.channel);
-
-    navigation.setOptions({
-      headerTitle: () => <ChannelLogo image={channel.fullLogo} />,
-    });
-  };
-
-  const getHtml = async (link) => {
+  const getContent = async (link) => {
     setArticle(null);
-    try {
-      const data = await fetch(`https://extractor-lepiant.deno.dev?url=${link}`).then((response) =>
-        response.json()
-      );
-      setArticle(data);
-    } catch (error) {
-      return null;
-    }
+    const data = await fetch(`https://extractor-lepiant.deno.dev?url=${link}`).then((response) =>
+      response.json()
+    );
+    const channel = getChannelsDetails(openArticleViewerDetails?.channel);
+
+    navigation.setOptions({
+      headerTitle: () => channel?.fullLogo ? <ChannelLogo image={channel?.fullLogo} /> : <Text>{data?.source}</Text>,
+    });
+
+    setArticle(data);
   };
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <View
-          style={{
-            marginRight: 12,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <TextZoom setTextZoom={setTextZoom} textZoom={textZoom} />
-
-          <View
-            style={{
-              backgroundColor: primaryColor10,
-              borderRadius: 100,
-              width: 35,
-              height: 35,
-            }}
-          >
-            <ArticleShareButton article={openArticleViewerDetails} />
-          </View>
-        </View>
-      ),
+      headerRight: () => <HeaderActions />,
     });
-  }, [textZoom]);
+
+  }, []);
 
   useEffect(() => {
-    getHtml(openArticleViewerDetails?.link);
-    getChannelDetail();
+    getContent(openArticleViewerDetails?.link)
   }, [openArticleViewerDetails]);
 
   return (

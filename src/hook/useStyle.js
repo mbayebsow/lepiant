@@ -21,7 +21,7 @@ export default function useStyles() {
   let colorLight = isDarkMode ? "#C2C2C2" : "#949494";
   let inputBackground = isDarkMode ? Colors.dark : "#e3e3e3";
   let backgroundColor = isDarkMode ? "#171717" : Colors.white;
-  let backgroundColorLight = isDarkMode ? "#292929" : "#f2f2f2";
+  let backgroundColorLight = isDarkMode ? "#292929" : "#F2F2F7";
 
   const inputStyle = {
     width: "100%",

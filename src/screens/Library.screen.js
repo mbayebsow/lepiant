@@ -4,10 +4,14 @@ import Channels from "../components/Channels.component";
 import HeaderSection from "../components/HeaderSection";
 import useStyles from "../hook/useStyle";
 
+
 export default function LibraryScreen() {
   const { backgroundColor, backgroundColorLight } = useStyles();
+
   return (
     <TabLayout backgroundColor={backgroundColorLight}>
+
+      <HeaderSection title="Chaînes" />
       <Channels items={5} viewType="card" />
       <View
         style={{

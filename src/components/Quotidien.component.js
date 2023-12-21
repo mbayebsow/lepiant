@@ -17,8 +17,8 @@ function QuotidienCard({ image }) {
         borderColor: backgroundColorLight,
         borderWidth: 2,
         borderRadius: 7,
-        aspectRatio: 3 / 4.2,
-        width: 85,
+        aspectRatio: 3 / 4.3,
+        width: 80,
         overflow: "hidden",
       }}
     >
@@ -45,16 +45,16 @@ export default function Quotidien() {
         >
           {quotidiens
             ? quotidiens.files.slice(0, 7).map((quotidien, i) => (
-                <Pressable
-                  key={i}
-                  onPress={() => {
-                    setQIndex(i);
-                    navigation.navigate("Quotidien");
-                  }}
-                >
-                  <QuotidienCard image={quotidien.imageUrl} />
-                </Pressable>
-              ))
+              <Pressable
+                key={i}
+                onPress={() => {
+                  setQIndex(i);
+                  navigation.navigate("Quotidien");
+                }}
+              >
+                <QuotidienCard image={quotidien.imageUrl} />
+              </Pressable>
+            ))
             : null}
           <View
             style={{

@@ -9,44 +9,52 @@ const Store = createStore({
     categoryIndex: null,
     openArticleViewerDetails: null,
     loading: true,
+    textZoom: 1
   },
   actions: {
     setCategories:
       () =>
-      async ({ setState }) => {
-        const categories = await fetchCategories();
-        setState({
-          categories,
-        });
-      },
+        async ({ setState }) => {
+          const categories = await fetchCategories();
+          setState({
+            categories,
+          });
+        },
     setArticles:
       (articles) =>
-      ({ setState }) => {
-        setState({
-          articles,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            articles,
+          });
+        },
     setCategoryIndex:
       (categoryIndex) =>
-      ({ setState }) => {
-        setState({
-          categoryIndex,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            categoryIndex,
+          });
+        },
     setOpenArticleViewerDetails:
       (openArticleViewerDetails) =>
-      ({ setState }) => {
-        setState({
-          openArticleViewerDetails,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            openArticleViewerDetails,
+          });
+        },
     setLoading:
       (loading) =>
-      ({ setState }) => {
-        setState({
-          loading,
-        });
-      },
+        ({ setState }) => {
+          setState({
+            loading,
+          });
+        },
+    setTextZoom:
+      (textZoom) =>
+        ({ setState }) => {
+          setState({
+            textZoom,
+          });
+        },
   },
 });
 
@@ -54,8 +62,8 @@ export default function useArticle() {
   const { userData } = useSession();
   const dataStore = createHook(Store);
   const [
-    { articles, categories, categoryIndex, openArticleViewerDetails, loading },
-    { setArticles, setCategoryIndex, setCategories, setOpenArticleViewerDetails, setLoading },
+    { articles, categories, categoryIndex, openArticleViewerDetails, loading, textZoom },
+    { setArticles, setCategoryIndex, setCategories, setOpenArticleViewerDetails, setLoading, setTextZoom },
   ] = dataStore();
 
   const getArticlesByCategory = async (category) => {
@@ -78,6 +86,8 @@ export default function useArticle() {
     categories,
     categoryIndex,
     openArticleViewerDetails,
+    textZoom,
+    setTextZoom,
     setCategories,
     getArticlesByCategory,
     getRandomArticles,
