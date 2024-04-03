@@ -5,11 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 import { Save } from "lucide-react-native";
 import Carousel from "react-native-reanimated-carousel";
 
-import avatar from "../lib/avatar.json";
+import avatar from "../utils/avatar.json";
 import useSession from "../hook/useSession";
 import useStyles from "../hook/useStyle";
 import Input from "../components/ui/Input";
-import PrimaryBouton from "../components/ui/PrimaryBouton";
+import PrimaryBouton from "../components/ui/button";
 
 export default function ProfileEditScreen() {
   const navigation = useNavigation();
