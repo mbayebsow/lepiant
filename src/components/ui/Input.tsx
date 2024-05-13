@@ -1,4 +1,10 @@
-import { Pressable, Text, TextInput } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+} from "react-native";
 import useStyles from "../../hook/useStyle";
 import { FC } from "react";
 import { View } from "react-native";
@@ -27,29 +33,49 @@ const Input: FC<InputProps> = ({
   textContentType,
   autoCompleteType,
 }) => {
-  const { color, inputBackground, backgroundColorLight } = useStyles();
+  const {
+    color,
+    borderColor,
+    colorLight,
+    inputBackground,
+    backgroundColorLight,
+  } = useStyles();
 
   return (
-    <>
-      {label && <Text style={{ marginBottom: 5, paddingLeft: 5 }}>{label}</Text>}
+    <View
+      style={{
+        // flex: 1,
+        padding: 10,
+        height: "auto",
+      }}>
+      {label && (
+        <Text
+          style={{
+            marginBottom: 5,
+            marginLeft: 6,
+            paddingLeft: 5,
+            color: colorLight,
+          }}>
+          {label}
+        </Text>
+      )}
       <View
         style={{
-          flex: 1,
-          width: "100%",
+          // flex: 1,
           paddingHorizontal: 12,
           borderRadius: 10,
           backgroundColor: backgroundColorLight,
-          marginBottom: 15,
-          height: 40,
+          height: 50,
           alignItems: "center",
           justifyContent: "space-between",
           flexDirection: "row",
-        }}
-      >
+          borderColor: borderColor,
+          borderWidth: 1,
+        }}>
         <TextInput
           value={value}
           style={{
-            width: "90%",
+            flex: 1,
             height: "100%",
             color,
             // backgroundColor: "red",
@@ -71,12 +97,11 @@ const Input: FC<InputProps> = ({
             width: "10%",
             alignItems: "center",
             justifyContent: "center",
-          }}
-        >
+          }}>
           <Delete size={20} color={color} />
         </Pressable>
       </View>
-    </>
+    </View>
   );
 };
 

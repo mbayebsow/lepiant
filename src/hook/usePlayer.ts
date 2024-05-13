@@ -1,26 +1,29 @@
 import { create } from "zustand";
-import TrackPlayer, { useTrackPlayerEvents, Capability, Event } from "react-native-track-player";
-import { AverageColor, TrackPlaylist } from "../utils/interfaces";
+import TrackPlayer, { Capability, Track } from "react-native-track-player";
+import { AverageColor } from "../utils/interfaces";
 import { getColorAverage } from "../utils/helpers/colorAverage";
 
 interface PlayerStore {
-  playlist: { from: string | number; data: TrackPlaylist[] } | null;
-  currentSong: TrackPlaylist | null;
+  playlist: Track[] | null;
+  playlistFrom: number | string | null;
+  currentSong: Track | null;
   status: number;
   averageColor: AverageColor | null;
   isTrackPlayerInit: boolean;
   initializeTrackPlayer: () => Promise<void>;
-  setPlaylist: (playlist: TrackPlaylist[], from: string | number) => Promise<void>;
+  setPlaylist: (playlist: Track[], from: string | number) => Promise<void>;
   playAudio: (id: number, from: string | number) => Promise<void>;
   togglePlayPause: () => Promise<void>;
   handleNext: () => Promise<void>;
   handlePrev: () => Promise<void>;
   setStatus: (status: number) => void;
   updateAverageColor: () => void;
+  setCurrentSong: (track: Track) => void;
 }
 
 const usePlayerStore = create<PlayerStore>()((set, get) => ({
   playlist: null,
+  playlistFrom: null,
   currentSong: null,
   status: 0,
   averageColor: null,
@@ -49,32 +52,44 @@ const usePlayerStore = create<PlayerStore>()((set, get) => ({
     });
     set(() => ({ isTrackPlayerInit: true }));
   },
-  setPlaylist: async (playlist: TrackPlaylist[], from: string | number) => {
-    const playlistFrom = get().playlist?.from;
+  setCurrentSong: async (track: Track) => {
+    const currentSong = get().currentSong;
+    if (currentSong?.id !== track.id) {
+      set(() => ({ currentSong: track }));
+
+      if (track.artwork) {
+        const color = await getColorAverage(track.artwork);
+        if (color) set(() => ({ averageColor: color }));
+      }
+    }
+  },
+  setPlaylist: async (playlist: Track[], from: string | number) => {
+    const playlistFrom = get().playlistFrom;
 
     if (playlistFrom !== from) {
       const queue = await TrackPlayer.getQueue();
       if (queue.length > 0) null;
     }
 
-    set(() => ({ playlist: { from, data: playlist } }));
+    set(() => ({ playlist: playlist }));
+    // set(() => ({ playlistFrom: from }));
   },
   playAudio: async (id: number, from: string | number) => {
-    const playlist = get().playlist?.data;
+    const playlist = get().playlist;
+    const playlistFrom = get().playlistFrom;
 
     if (playlist) {
-      const trackIndex = playlist.findIndex((track) => track.id === id);
+      const trackIndex = playlist.findIndex(track => track.id === id);
 
       if (trackIndex !== -1) {
-        const currentSong = playlist[trackIndex];
+        // const currentSong = playlist[trackIndex];
 
-        set(() => ({ currentSong }));
-        get().updateAverageColor();
-
-        const queue = await TrackPlayer.getQueue();
-        if (queue.length > 0) await TrackPlayer.reset();
-
-        await TrackPlayer.add(playlist);
+        if (playlistFrom !== from) {
+          await TrackPlayer.reset();
+          await TrackPlayer.add(playlist);
+          set(() => ({ playlistFrom: from }));
+          // set(() => ({ currentSong }));
+        }
 
         await TrackPlayer.skip(trackIndex);
         await TrackPlayer.play();
@@ -90,21 +105,21 @@ const usePlayerStore = create<PlayerStore>()((set, get) => ({
   },
   handleNext: async () => {
     await TrackPlayer.skipToNext();
-    const index = await TrackPlayer.getActiveTrackIndex();
-    if (index) {
-      const track = get().playlist?.data[index];
-      if (track) set(() => ({ currentSong: track }));
-      get().updateAverageColor();
-    }
+    // const index = await TrackPlayer.getActiveTrackIndex();
+    // if (index) {
+    //   const track = get().playlist?.data[index];
+    //   if (track) set(() => ({ currentSong: track }));
+    //   get().updateAverageColor();
+    // }
   },
   handlePrev: async () => {
     await TrackPlayer.skipToPrevious();
-    const index = await TrackPlayer.getActiveTrackIndex();
-    if (index) {
-      const track = get().playlist?.data[index];
-      if (track) set(() => ({ currentSong: track }));
-      get().updateAverageColor();
-    }
+    // const index = await TrackPlayer.getActiveTrackIndex();
+    // if (index) {
+    //   const track = get().playlist?.data[index];
+    //   if (track) set(() => ({ currentSong: track }));
+    //   get().updateAverageColor();
+    // }
   },
   setStatus: (status: number) => {
     set(() => ({ status }));

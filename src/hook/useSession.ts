@@ -1,8 +1,12 @@
-import { getUserSession, userVerifyMail, userVerifyOTP } from "../services/session-service";
+import {
+  getUserSession,
+  userVerifyMail,
+  userVerifyOTP,
+  updateUserSession,
+} from "../services/session-service";
 import { create } from "zustand";
 import { User } from "../utils/interfaces";
 import { Alert } from "react-native";
-// import Toast from "react-native-simple-toast";
 
 interface SessionStore {
   isLogin: boolean;
@@ -11,9 +15,10 @@ interface SessionStore {
   loading: boolean;
   handleLogin: (email: string, code?: string) => void;
   initSession: () => Promise<void>;
+  updateUser: (user: Partial<User>) => Promise<boolean>;
 }
 
-const useSessionStore = create<SessionStore>()((set) => ({
+const useSessionStore = create<SessionStore>()(set => ({
   isLogin: false,
   userData: null,
   stepLogin: 1,
@@ -39,10 +44,10 @@ const useSessionStore = create<SessionStore>()((set) => ({
         const verifyOtp = await userVerifyOTP(email, code);
         if (verifyOtp.success) {
           const user = await getUserSession();
-          if (user.success) {
+          if (user) {
             set({
               isLogin: true,
-              userData: user.user,
+              userData: user,
               loading: false,
             });
           }
@@ -57,12 +62,23 @@ const useSessionStore = create<SessionStore>()((set) => ({
   },
   initSession: async () => {
     const user = await getUserSession();
-    if (user.success) {
+    if (user) {
       set({
         isLogin: true,
-        userData: user.user,
+        userData: user,
       });
     }
+  },
+  updateUser: async (user: Partial<User>) => {
+    const updateUser = await updateUserSession(user);
+
+    if (updateUser) {
+      set({
+        userData: updateUser,
+      });
+      return true;
+    }
+    return false;
   },
 }));
 

@@ -1,17 +1,9 @@
-import moment from "moment";
 import config from "../utils/constant/config";
 import { fetcher } from "../utils/helpers/fetcher";
-import { getDataOnStore, setDataOnStore } from "../utils/helpers/localStorage";
-import {
-  Article,
-  ArticleCategory,
-  ArticleContent,
-  ArticleSaved,
-  TopNews,
-} from "../utils/interfaces";
+import { Article, ArticleCategory, ArticleContent, ArticleSaved } from "../utils/interfaces";
 
 export const fetchCategories = async (updateLocal?: boolean) => {
-  const categories = await fetcher<ArticleCategory[]>(`${config.API_ENDPOINT}/article-categories`);
+  const categories = await fetcher<ArticleCategory[]>(`${config.API_ENDPOINT}/articles/categories`);
   return categories;
 };
 
@@ -44,26 +36,7 @@ export const toggleSaveArticle = async (articleId: number) => {
   return response;
 };
 
-export const fetchTopNews = async (): Promise<TopNews[] | false> => {
-  let response: TopNews[] | false = [];
-
-  const dataOnStore = await getDataOnStore("topNews");
-
-  if (dataOnStore) {
-    const parsedData = JSON.parse(dataOnStore);
-    const diff = moment().diff(parsedData.addedTime, "minutes");
-
-    if (diff >= 120 || diff === 0) {
-      const topNews = await fetcher<TopNews[]>(`${config.API_ENDPOINT}/articles/live`);
-      response = topNews;
-    } else {
-      return parsedData;
-    }
-  } else {
-    const topNews = await fetcher<TopNews[]>(`${config.API_ENDPOINT}/articles/live`);
-    response = topNews;
-  }
-
-  await setDataOnStore("topNews", JSON.stringify(response));
-  return response;
+export const fetchTopNews = async () => {
+  const topNews = await fetcher<Article[]>(`${config.API_ENDPOINT}/articles/live`);
+  return topNews;
 };

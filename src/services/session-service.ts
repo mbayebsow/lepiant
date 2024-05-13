@@ -5,7 +5,7 @@ import { SuccessLogin, SuccessVerify, User } from "../utils/interfaces";
 
 const validateEmail = (email: string) => {
   return email.match(
-    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
   );
 };
 
@@ -77,26 +77,23 @@ export async function userVerifyOTP(email: string, inputCode: string) {
   }
 }
 
-export async function getUserSession(): Promise<{
-  success: boolean;
-  user?: User;
-  message?: string;
-}> {
+export async function getUserSession() {
   const Token = await getDataOnStore("userToken");
-
-  if (!Token) return { success: false, message: "Pas de session" };
+  if (!Token) return false;
 
   const user = await fetcher<User>(`${config.API_ENDPOINT}/auth/me`);
+  if (!user) return false;
 
-  if (!user)
-    return { success: false, message: "Impossible de récupérer les informations de l'utilisateur" };
-
-  await setDataOnStore("userSession", JSON.stringify(user));
-  return { success: true, user: user };
+  return user;
 }
 
 export async function updateUserSession(data: Partial<User>) {
-  const user = await fetcher(`${config.API_ENDPOINT}/auth/updateMe`, "POST", data);
+  const user = await fetcher<{ success: boolean; message: string }>(
+    `${config.API_ENDPOINT}/auth/updateMe`,
+    "POST",
+    data,
+  );
+  if (!user || !user.success) return false;
 
-  if (user) await getUserSession();
+  return await getUserSession();
 }

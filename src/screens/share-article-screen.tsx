@@ -6,16 +6,15 @@ import {
   Pressable,
   ActivityIndicator,
   Image,
-  SafeAreaView,
-  Dimensions,
 } from "react-native";
-import { ShareIcon, X } from "lucide-react-native";
+import { ShareIcon } from "lucide-react-native";
 import ViewShot from "react-native-view-shot";
 import Share from "react-native-share";
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp } from "@react-navigation/native";
 import useStyles from "../hook/useStyle";
 import { getColorAverage } from "../utils/helpers/colorAverage";
 import { Article, AverageColor, Channel } from "../utils/interfaces";
+import ModalPageLayout from "../components/layout/modal-page-layout";
 
 type ParamArticle = {
   SharArticle: {
@@ -24,17 +23,18 @@ type ParamArticle = {
   };
 };
 
-export default function ShareArticleScreen() {
+const ShareArticleScreen = () => {
   const viewShotRef = useRef<ViewShot>(null);
-  const navigation = useNavigation();
   const route = useRoute<RouteProp<ParamArticle, "SharArticle">>();
-  const [averageColor, setAverageColor] = useState<AverageColor | false | "loading">("loading");
-  const { backgroundColorLight, backgroundColor, color } = useStyles();
-  const screenWidth = Dimensions.get("window").width;
+  const [averageColor, setAverageColor] = useState<
+    AverageColor | false | "loading"
+  >("loading");
+  const { backgroundColorLight, backgroundColor, color } =
+    useStyles();
   const { article, channel } = route.params;
 
   const captureArticle = () => {
-    viewShotRef.current?.capture().then((uri) => {
+    viewShotRef.current?.capture().then(uri => {
       const shareOptions = {
         title: "Share via",
         message: `${article.title} - ${channel.name}`,
@@ -46,10 +46,10 @@ export default function ShareArticleScreen() {
       };
 
       Share.open(shareOptions)
-        .then((res) => {
+        .then(res => {
           console.log(res);
         })
-        .catch((err) => {
+        .catch(err => {
           err && console.log(err);
         });
     });
@@ -69,182 +69,144 @@ export default function ShareArticleScreen() {
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "flex-end",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.6)",
-      }}
-    >
-      <SafeAreaView
+    <ModalPageLayout backgroundColor={backgroundColorLight}>
+      <View
         style={{
-          backgroundColor: backgroundColorLight,
-          borderRadius: 30,
-          overflow: "hidden",
-          width: "100%",
-        }}
-      >
-        <View style={{ width: "100%", padding: 10 }}>
-          <View
-            style={{
-              gap: 10,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: screenWidth - 50,
-            }}
-          >
+          gap: 10,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          height: 500,
+          padding: 12,
+        }}>
+        <ViewShot
+          ref={viewShotRef}
+          // onCapture={onCapture} captureMode="mount"
+          options={{
+            fileName: "Your-File-Name",
+            format: "jpg",
+            quality: 0.9,
+          }}
+          style={{ width: "100%" }}>
+          {averageColor !== "loading" ? (
             <View
               style={{
+                // aspectRatio: 1,
+                backgroundColor: averageColor
+                  ? averageColor.color?.hex
+                  : backgroundColor,
+                overflow: "hidden",
+                width: "100%",
+                padding: 20,
+                borderRadius: 25,
                 display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}
-            >
-              <Pressable
-                style={{
-                  backgroundColor,
-                  padding: 10,
-                  borderRadius: 100,
-                  width: 40,
-                  height: 40,
-                }}
-                onPress={() => navigation.goBack()}
-              >
-                <X color={color} size={20} />
-              </Pressable>
-            </View>
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}>
+              <View>
+                <Text
+                  style={{
+                    fontSize: 22,
+                    fontWeight: "bold",
+                    color: averageColor
+                      ? averageColor.color?.isDark
+                        ? "white"
+                        : "black"
+                      : color,
+                  }}>
+                  {article.title}
+                </Text>
+              </View>
 
-            <ViewShot
-              ref={viewShotRef}
-              // onCapture={onCapture} captureMode="mount"
-              options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}
-              style={{ width: "100%" }}
-            >
-              {averageColor !== "loading" ? (
+              <View>
                 <View
                   style={{
-                    // aspectRatio: 1,
-                    backgroundColor: averageColor ? averageColor.color?.hex : backgroundColor,
+                    backgroundColor: "#8c8c95",
+                    marginVertical: 20,
+                    borderRadius: 10,
                     overflow: "hidden",
-                    width: "100%",
-                    padding: 20,
-                    borderRadius: 25,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 22,
-                        fontWeight: "bold",
-                        color: averageColor
-                          ? averageColor.color?.isDark
-                            ? "white"
-                            : "black"
-                          : color,
-                      }}
-                    >
-                      {article.title}
-                    </Text>
-                  </View>
-
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: "#8c8c95",
-                        marginVertical: 20,
-                        borderRadius: 10,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Image
-                        style={{ width: "100%", aspectRatio: 16 / 9 }}
-                        source={{
-                          uri: article.image,
-                        }}
-                      />
-                    </View>
-
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 20,
-                      }}
-                    >
-                      <Image
-                        style={{ width: 25, height: 25, borderRadius: 100 }}
-                        source={{
-                          uri: channel.logo,
-                        }}
-                      />
-
-                      <Text
-                        style={{
-                          color: averageColor
-                            ? averageColor.color?.isDark
-                              ? "white"
-                              : "black"
-                            : color,
-                        }}
-                      >
-                        {channel.name}
-                      </Text>
-                      <Text
-                        style={{
-                          color: averageColor
-                            ? averageColor.color?.isDark
-                              ? "white"
-                              : "black"
-                            : color,
-                        }}
-                      >
-                        {moment(article.published).fromNow()}
-                      </Text>
-                    </View>
-                  </View>
+                  }}>
+                  <Image
+                    style={{ width: "100%", aspectRatio: 16 / 9 }}
+                    source={{
+                      uri: article.image,
+                    }}
+                  />
                 </View>
-              ) : (
-                <ActivityIndicator />
-              )}
-            </ViewShot>
 
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                marginVertical: 0,
-              }}
-            >
-              <Pressable
-                style={{
-                  backgroundColor: "black",
-                  padding: 10,
-                  paddingHorizontal: 15,
-                  height: 40,
-                  borderRadius: 20,
-                  display: "flex",
-                  gap: 7,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-                onPress={() => captureArticle()}
-              >
-                <ShareIcon size={20} color="white" />
-                <Text style={{ color: "white" }}>Partager</Text>
-              </Pressable>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 20,
+                  }}>
+                  <Image
+                    style={{
+                      width: 25,
+                      height: 25,
+                      borderRadius: 100,
+                    }}
+                    source={{
+                      uri: channel.logo,
+                    }}
+                  />
+
+                  <Text
+                    style={{
+                      color: averageColor
+                        ? averageColor.color?.isDark
+                          ? "white"
+                          : "black"
+                        : color,
+                    }}>
+                    {channel.name}
+                  </Text>
+                  <Text
+                    style={{
+                      color: averageColor
+                        ? averageColor.color?.isDark
+                          ? "white"
+                          : "black"
+                        : color,
+                    }}>
+                    {moment(article.published).fromNow()}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
+          ) : (
+            <ActivityIndicator />
+          )}
+        </ViewShot>
+
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginVertical: 0,
+          }}>
+          <Pressable
+            style={{
+              backgroundColor: "black",
+              padding: 10,
+              paddingHorizontal: 15,
+              borderRadius: 20,
+              display: "flex",
+              gap: 10,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+            onPress={() => captureArticle()}>
+            <ShareIcon size={20} color="white" />
+            <Text style={{ color: "white" }}>Partager</Text>
+          </Pressable>
         </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </ModalPageLayout>
   );
-}
+};
+
+export default ShareArticleScreen;

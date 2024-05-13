@@ -24,11 +24,10 @@ export default function QuotidienScreen() {
   const getColor = async (image: string) => {
     const color = await getColorAverage(image);
     setAverageColor(color);
-    if (color) {
-      navigation.setOptions({
-        headerStyle: { backgroundColor: color.success ? color.color?.hex : backgroundColor },
-      });
-    }
+
+    navigation.setOptions({
+      headerStyle: { backgroundColor: color ? color.color?.hex : backgroundColor },
+    });
   };
 
   useMemo(() => {

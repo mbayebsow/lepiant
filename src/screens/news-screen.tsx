@@ -1,10 +1,10 @@
 import moment from "moment/moment";
-import { ActivityIndicator, Image, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { Plus } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { QuotidienNavigateParams } from "../utils/types";
-import { Revues, TrackPlaylist } from "../utils/interfaces";
+import { Article, Revues } from "../utils/interfaces";
 import config from "../utils/constant/config";
 import useArticleStore from "../hook/useArticle";
 import useStyles from "../hook/useStyle";
@@ -18,6 +18,8 @@ import ArticleCategories from "../components/article/article-categories";
 import ArticleItem from "../components/article/article-item";
 import QuotidienThumbnail from "../components/quotidien/quotidien-thumbnail";
 import RevueCard from "../components/revue/revue-card";
+import SuggestedChannels from "../components/channel/suggested-channels";
+import { revueToPlaylist } from "../utils/helpers/playlist-mapping";
 
 function LogoTitle() {
   return <Image style={{ width: 80, height: 35 }} source={require("../assets/icon-default.png")} />;
@@ -25,7 +27,7 @@ function LogoTitle() {
 
 const QuotidienDaily = () => {
   const navigation = useNavigation<StackNavigationProp<QuotidienNavigateParams>>();
-  const quotidiens = useQuotidienStore((state) => state.quotidiens);
+  const quotidiens = useQuotidienStore(state => state.quotidiens);
 
   return (
     <View>
@@ -38,8 +40,7 @@ const QuotidienDaily = () => {
               flexDirection: "row",
               gap: 5,
               paddingHorizontal: 12,
-            }}
-          >
+            }}>
             {quotidiens.data.slice(0, 7).map((quotidien, i) => (
               <QuotidienThumbnail
                 key={i}
@@ -56,8 +57,7 @@ const QuotidienDaily = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 marginHorizontal: 20,
-              }}
-            >
+              }}>
               <Pressable
                 onPress={() =>
                   navigation.navigate("Quotidien", { quotidiens: quotidiens.data, activeIndex: 7 })
@@ -66,8 +66,7 @@ const QuotidienDaily = () => {
                   backgroundColor: "#eb445a21",
                   borderRadius: 100,
                   padding: 5,
-                }}
-              >
+                }}>
                 <Plus size={30} color="#eb445a" />
               </Pressable>
             </View>
@@ -81,25 +80,14 @@ const QuotidienDaily = () => {
 };
 
 const RevuesDaily = () => {
-  const revues = useRevueStore((state) => state.revues);
-  const playlist = usePlayerStore((state) => state.playlist);
-  const setPlaylist = usePlayerStore((state) => state.setPlaylist);
-  const playAudio = usePlayerStore((state) => state.playAudio);
-
-  function revueToPlaylist(revue: Revues): TrackPlaylist {
-    return {
-      id: revue.id,
-      title: revue.name,
-      artist: "L'epiant",
-      artwork: config.DEFAULT_REVUE_IMAGE,
-      url: revue.audio,
-      isLiveStream: false,
-    };
-  }
+  const revues = useRevueStore(state => state.revues);
+  const playlistFrom = usePlayerStore(state => state.playlistFrom);
+  const setPlaylist = usePlayerStore(state => state.setPlaylist);
+  const playAudio = usePlayerStore(state => state.playAudio);
 
   async function playRevue(revue: Revues) {
-    if (playlist?.from !== "revue") {
-      const revueParsed = revues?.data.map((revue) => revueToPlaylist(revue));
+    if (playlistFrom !== "revue") {
+      const revueParsed = revues?.data.map(revue => revueToPlaylist(revue));
       if (revueParsed) await setPlaylist(revueParsed, "revue");
     }
     playAudio(revue.id, "revue");
@@ -118,15 +106,13 @@ const RevuesDaily = () => {
               flexDirection: "row",
               gap: 10,
               paddingHorizontal: 12,
-            }}
-          >
+            }}>
             {revues.data.map((revue, i) => (
               <Pressable
                 key={i}
                 onPress={() => {
                   playRevue(revue);
-                }}
-              >
+                }}>
                 <RevueCard name={revue.name} image={config.DEFAULT_REVUE_IMAGE} />
               </Pressable>
             ))}
@@ -141,22 +127,36 @@ const RevuesDaily = () => {
 
 const NewsScreen = () => {
   const { backgroundColorLight } = useStyles();
-  const loading = useArticleStore((state) => state.loading);
-  const articles = useArticleStore((state) => state.articles);
+  const loading = useArticleStore(state => state.loading);
+  const articles = useArticleStore(state => state.articles);
+  const categoryActiveIndex = useArticleStore(state => state.categoryActiveIndex);
+  const getArticlesByCategory = useArticleStore(state => state.getArticlesByCategory);
+
+  const feed = (list: Article[]) => {
+    return list.flatMap((item, index) => {
+      if ((index + 1) % 5 === 0) {
+        return [
+          <ArticleItem key={index} article={item} />,
+          <SuggestedChannels key={`channel-${index}`} />,
+        ];
+      }
+      return <ArticleItem key={index} article={item} />;
+    });
+  };
+
   return (
     <TabLayout
       headerCenter={<LogoTitle />}
       stickyHeaderIndices={[4]}
       hideLargeHeader
-      showHeaderCenter
-    >
+      showHeaderCenter>
       <TopNews />
 
       <RevuesDaily />
       <QuotidienDaily />
 
       <HeaderSection title="Dernieres actualites" span="il ya 1mn" />
-      <ArticleCategories />
+      <ArticleCategories onClick={getArticlesByCategory} activeIndex={categoryActiveIndex} />
 
       <View>
         {loading && <ActivityIndicator />}
@@ -166,9 +166,8 @@ const NewsScreen = () => {
             backgroundColor: backgroundColorLight,
             display: "flex",
             gap: 10,
-          }}
-        >
-          {articles && articles.map((article, i) => <ArticleItem key={i} article={article} />)}
+          }}>
+          {articles && feed(articles).map(item => item)}
         </View>
       </View>
     </TabLayout>

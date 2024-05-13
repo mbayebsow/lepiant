@@ -14,6 +14,7 @@ import ChannelSubscribButton from "../components/channel/channel-subscrib-button
 import useChannelStore from "../hook/useChannel";
 import countryFlag from "../utils/constant/country-flag";
 import { StackNavigationProp } from "@react-navigation/stack";
+import useArticleStore from "../hook/useArticle";
 
 type ParamChannel = {
   Chaine: {
@@ -21,14 +22,16 @@ type ParamChannel = {
   };
 };
 
-const HeaderCenter: FC<{ channel: Channel }> = ({ channel }) =>
-  channel.fullLogo ? (
+const HeaderCenter: FC<{ channel: Channel }> = ({ channel }) => {
+  const { color } = useStyles();
+  return channel.fullLogo ? (
     <View style={{ width: 150, height: 30 }}>
       <Image src={channel.fullLogo} resizeMode="contain" />
     </View>
   ) : (
-    <Text style={{ fontSize: 20, fontWeight: "bold" }}>{channel.name}</Text>
+    <Text style={{ fontSize: 20, fontWeight: "bold", color }}>{channel.name}</Text>
   );
+};
 
 const HeaderComponent = ({ showNavBar }: { showNavBar: SharedValue<number> }) => {
   const route = useRoute<RouteProp<ParamChannel, "Chaine">>();
@@ -56,6 +59,7 @@ const LargeHeaderComponent = () => {
   const { channel } = route.params;
   const { color, colorLight, backgroundColorLight } = useStyles();
   const ch = useChannelStore((state) => state.channels.find((c) => c.id === channel.id) || channel);
+  const categories = useArticleStore((state) => state.categories);
 
   return (
     <LargeHeader
@@ -116,12 +120,11 @@ const LargeHeaderComponent = () => {
             </View>
 
             <View style={{ flexDirection: "row", gap: 5, paddingVertical: 2 }}>
-              <Text style={{ fontSize: 12, fontWeight: "bold", color: colorLight }}>
-                #categorie
-              </Text>
-              <Text style={{ fontSize: 12, fontWeight: "bold", color: colorLight }}>
-                #categorie
-              </Text>
+              {channel.sources.map((source, i) => (
+                <Text key={i} style={{ fontSize: 12, fontWeight: "bold", color: colorLight }}>
+                  #{categories.find((c) => c.id === source.categorieId)?.name}
+                </Text>
+              ))}
             </View>
           </View>
         </View>

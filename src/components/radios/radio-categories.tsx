@@ -38,7 +38,7 @@ const RadioCategories = () => {
         style={{
           display: "flex",
           flexDirection: "row",
-          gap: 5,
+          gap: 10,
         }}
       >
         {categories &&

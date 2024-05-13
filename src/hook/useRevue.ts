@@ -1,4 +1,3 @@
-import { createHook, createStore } from "react-sweet-state";
 import { getRevues } from "../services/revues-service";
 import { create } from "zustand";
 import { Revues, StorageIterface } from "../utils/interfaces";
@@ -20,33 +19,3 @@ const useRevueStore = create<RevueStore>()((set, get) => ({
 }));
 
 export default useRevueStore;
-
-// const Store = createStore({
-//   initialState: {
-//     revues: null,
-//   },
-//   actions: {
-//     setRevues:
-//       (revues) =>
-//       async ({ setState }) => {
-//         setState({
-//           revues,
-//         });
-//       },
-//   },
-// });
-
-// export default function useRevue() {
-//   const dataStore = createHook(Store);
-//   const [{ revues }, { setRevues }] = dataStore();
-
-//   const initRevues = async () => {
-//     const revues = await getRevues();
-//     setRevues(revues);
-//   };
-
-//   return {
-//     initRevues,
-//     revues,
-//   };
-// }

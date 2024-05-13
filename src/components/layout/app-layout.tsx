@@ -94,11 +94,11 @@ const AppLayout: FC<AppLayoutProps> = ({
 
   const initData = async () => {
     setRefreshing(true);
-    await initRadios();
-    await initRevues();
-    await initArticles();
-    await initChannels();
-    await initQuotidiens();
+    await initRadios(true);
+    await initRevues(true);
+    await initArticles(true);
+    await initChannels(true);
+    await initQuotidiens(true);
     setRefreshing(false);
   };
 

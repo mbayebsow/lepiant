@@ -19,9 +19,10 @@ export default function useStyles() {
 
   let color: string = isDarkMode ? Colors.white : Colors.black;
   let colorLight: string = isDarkMode ? "#C2C2C2" : "#949494";
+  let borderColor: string = isDarkMode ? "#363636" : "#e3e3e3";
   let inputBackground: string = isDarkMode ? Colors.dark : "#e3e3e3";
   let backgroundColor: string = isDarkMode ? "#171717" : Colors.white;
-  let backgroundColorLight: string = isDarkMode ? "#292929" : "#F2F2F7";
+  let backgroundColorLight: string = isDarkMode ? "#232323" : "#F2F2F7";
 
   const inputStyle = {
     width: "100%",
@@ -47,6 +48,7 @@ export default function useStyles() {
     secondaryColor,
     color,
     colorLight,
+    borderColor,
     backgroundColor,
     backgroundColorLight,
     inputStyle,

@@ -1,9 +1,14 @@
-import { toggleSubscribeChannel, getChannels } from "../services/channels-services";
+import {
+  toggleSubscribeChannel,
+  getChannels,
+  getSubscribedChannels,
+} from "../services/channels-services";
 import { create } from "zustand";
-import { Channel } from "../utils/interfaces";
+import { Channel, SubscribedChannel } from "../utils/interfaces";
 
 interface ChannelStore {
   channels: Channel[];
+  subscribedChannels: SubscribedChannel[];
   initChannels: (updateLocal?: boolean) => Promise<void>;
   toggleSubscribe: (channelId: number) => Promise<void>;
   getChannel: (channelId: number) => Promise<Channel | undefined>;
@@ -11,15 +16,18 @@ interface ChannelStore {
 
 const useChannelStore = create<ChannelStore>()((set, get) => ({
   channels: [],
+  subscribedChannels: [],
   initChannels: async (updateLocal?: boolean) => {
-    const channels = await getChannels(updateLocal);
-    set(() => ({
-      channels,
-    }));
+    const channels = await getChannels();
+    const subscribedChannels = await getSubscribedChannels();
+
+    if (channels) set(() => ({ channels }));
+    if (subscribedChannels) set(() => ({ subscribedChannels }));
   },
   toggleSubscribe: async (channelId: number) => {
     const channelSubscribed = await toggleSubscribeChannel(channelId);
-    await get().initChannels();
+    const subscribedChannels = await getSubscribedChannels();
+    if (subscribedChannels) set(() => ({ subscribedChannels }));
   },
   getChannel: async (id: number) => {
     const details = get().channels.find((obj) => obj.id === id);

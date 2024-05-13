@@ -9,14 +9,12 @@ import { ScrollView } from "react-native";
 import { View } from "react-native";
 import { trigger } from "react-native-haptic-feedback";
 
-// interface ArticleCategoriesProps {
-//   id: number;
-//   title: string;
-// }
+interface ArticleCategoriesProps {
+  activeIndex: number;
+  onClick: (articleId: number) => void;
+}
 
-const ArticleCategories: FC = () => {
-  const categoryActiveIndex = useArticleStore((state) => state.categoryActiveIndex);
-  const getArticlesByCategory = useArticleStore((state) => state.getArticlesByCategory);
+const ArticleCategories: FC<ArticleCategoriesProps> = ({ activeIndex, onClick }) => {
   const categories = useArticleStore((state) => state.categories);
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { isLogin } = useSession();
@@ -28,9 +26,9 @@ const ArticleCategories: FC = () => {
         style={{
           display: "flex",
           flexDirection: "row",
-          gap: 5,
+          gap: 10,
           paddingHorizontal: 12,
-          paddingVertical: 10,
+          paddingVertical: 6,
         }}
       >
         {categories &&
@@ -38,12 +36,11 @@ const ArticleCategories: FC = () => {
             <Pressable
               key={i}
               onPress={() => {
-                isLogin ? getArticlesByCategory(category.id) : navigation.navigate("Login");
+                isLogin ? onClick(category.id) : navigation.navigate("Login");
                 trigger("impactLight");
               }}
               style={{
-                backgroundColor:
-                  categoryActiveIndex === category.id ? primaryColor : backgroundColorLight,
+                backgroundColor: activeIndex === category.id ? primaryColor : backgroundColorLight,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
                 borderRadius: 7,
@@ -51,7 +48,7 @@ const ArticleCategories: FC = () => {
             >
               <Text
                 style={{
-                  color: categoryActiveIndex === category.id ? "white" : color,
+                  color: activeIndex === category.id ? "white" : color,
                   fontSize: 15,
                 }}
               >

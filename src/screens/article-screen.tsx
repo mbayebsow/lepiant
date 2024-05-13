@@ -35,8 +35,7 @@ const ArticleActionFab: FC<{
       <View style={styles.fab}>
         <Pressable
           style={styles.fabButtons}
-          onPress={() => textZoom > 1 && setTextZoom(textZoom - 0.5)}
-        >
+          onPress={() => textZoom > 1 && setTextZoom(textZoom - 0.5)}>
           <Text style={styles.fabButtonsTitle}>-A</Text>
         </Pressable>
 
@@ -44,8 +43,7 @@ const ArticleActionFab: FC<{
 
         <Pressable
           style={styles.fabButtons}
-          onPress={() => textZoom < 2.5 && setTextZoom(textZoom + 0.5)}
-        >
+          onPress={() => textZoom < 2.5 && setTextZoom(textZoom + 0.5)}>
           <Text style={styles.fabButtonsTitle}>+A</Text>
         </Pressable>
 
@@ -84,7 +82,7 @@ const ArticleScreen = () => {
     navigation.setOptions({
       headerTitle: () => <HeaderCenter channel={channel} />,
     });
-    getArticle(article.id).then((articleContent) => {
+    getArticle(article.id).then(articleContent => {
       if (articleContent) setArticleContent(articleContent);
     });
   }, [article]);
@@ -96,24 +94,27 @@ const ArticleScreen = () => {
           <View>
             <Text
               style={{
-                fontSize: 27,
+                fontSize: 20,
                 fontWeight: "bold",
-                paddingHorizontal: 12,
-                paddingTop: 12,
+                paddingHorizontal: 20,
+                paddingVertical: 10,
                 color,
-              }}
-            >
+              }}>
               {article.title}
             </Text>
+
+            <View style={{ width: "100%", aspectRatio: 16 / 9 }}>
+              <ImageComponent src={article.image} />
+            </View>
 
             <View
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexDirection: "row",
-                padding: 12,
-              }}
-            >
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+              }}>
               {channel && (
                 <View
                   style={{
@@ -121,8 +122,7 @@ const ArticleScreen = () => {
                     height: 25,
                     borderRadius: 100,
                     overflow: "hidden",
-                  }}
-                >
+                  }}>
                   <ImageComponent src={channel.logo} />
                 </View>
               )}
@@ -138,6 +138,7 @@ const ArticleScreen = () => {
               <View>
                 <Text style={{ color }}>{articleContent.source}</Text>
               </View>
+
               <View
                 style={{
                   borderEndWidth: 2,
@@ -152,18 +153,13 @@ const ArticleScreen = () => {
               </View>
             </View>
 
-            <View style={{ width: "100%", aspectRatio: 16 / 9 }}>
-              <ImageComponent src={article.image} />
-            </View>
-
-            <View pointerEvents="none" style={{ padding: 20, marginBottom: 50 }}>
+            <View pointerEvents="none" style={{ paddingHorizontal: 20, marginBottom: 100 }}>
               <Text
                 style={{
-                  fontSize: 20 * textZoom,
+                  fontSize: 15 * textZoom,
                   color,
-                  // textAlign: "justify",
-                }}
-              >
+                  textAlign: "justify",
+                }}>
                 {articleContent.content}
               </Text>
 

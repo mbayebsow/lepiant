@@ -6,11 +6,11 @@ import {
   toggleSaveArticle,
   fetchTopNews,
 } from "../services/articles-service";
-import { Article, ArticleCategory, ArticleSaved, TopNews } from "../utils/interfaces";
+import { Article, ArticleCategory, ArticleSaved } from "../utils/interfaces";
 
 interface ArticleStore {
   articles: Article[];
-  topNews: TopNews[];
+  topNews: Article[];
   categories: ArticleCategory[];
   savedArticles: ArticleSaved[];
   categoryActiveIndex: number;
@@ -27,19 +27,20 @@ const useArticleStore = create<ArticleStore>()((set, get) => ({
   topNews: [],
   categories: [],
   savedArticles: [],
-  categoryActiveIndex: 1,
+  categoryActiveIndex: 0,
   loading: true,
   textZoom: 1,
   initArticles: async (updateLocal?: boolean) => {
-    set(() => ({ loading: true, categoryActiveIndex: 1 }));
-    const articles = await fetchArticles(1);
+    set(() => ({ loading: true, categoryActiveIndex: 0 }));
+    const articles = await fetchArticles();
     const categories = await fetchCategories(updateLocal);
     const savedArticles = await fetchSavedArticles(updateLocal);
     const topNews = await fetchTopNews();
 
-    if (categories && articles && savedArticles && topNews) {
-      set(() => ({ articles, categories, savedArticles, topNews, loading: false }));
-    }
+    if (categories) set(() => ({ categories: [{ id: 0, name: "Tout" }].concat(categories) }));
+    if (articles) set(() => ({ articles, loading: false }));
+    if (savedArticles) set(() => ({ savedArticles }));
+    if (topNews) set(() => ({ topNews }));
   },
   getArticlesByCategory: async (id: number) => {
     set(() => ({ loading: true, categoryActiveIndex: id }));

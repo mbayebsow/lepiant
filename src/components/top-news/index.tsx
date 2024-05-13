@@ -14,7 +14,7 @@ interface TopNewsCardProps {
 }
 
 const TopNewsCard: FC<TopNewsCardProps> = ({ article }) => {
-  const { title, image, channelId, categorieId } = article;
+  const { title, image, categorieId, channelId } = article;
   const [channel, setChannel] = useState<Channel | undefined>(undefined);
   const [category, setCategory] = useState<ArticleCategory | undefined>(undefined);
   const getCategory = useArticleStore((state) => state.getCategory);
@@ -46,7 +46,7 @@ const TopNewsCard: FC<TopNewsCardProps> = ({ article }) => {
         >
           <View style={{ position: "absolute", bottom: 12, left: 12, right: 12 }}>
             <Text style={{ color: "white", fontSize: 10, marginBottom: 5 }}>
-              {channel?.name} | #{category?.name}
+              {channel?.name} #{category?.name}
             </Text>
             <Text style={{ color: "white", fontSize: 20, fontWeight: "700" }}>{title}</Text>
           </View>
@@ -58,16 +58,16 @@ const TopNewsCard: FC<TopNewsCardProps> = ({ article }) => {
 
 const TopNews = () => {
   const width = Dimensions.get("window").width;
-  const articles = useArticleStore((state) => state.articles);
+  const topNews = useArticleStore((state) => state.topNews);
 
   return (
-    articles && (
+    topNews && (
       <Carousel
         loop
         width={width}
         height={width / 1.7}
         autoPlay={true}
-        data={articles.slice(0, 5)}
+        data={topNews}
         autoPlayInterval={7000}
         scrollAnimationDuration={500}
         //onSnapToItem={(index) => console.log("current index:", index)}

@@ -7,10 +7,11 @@ export interface User {
   country: string;
   defaultStartedPage: string;
   allowNotifications: boolean;
-  categorie: number;
-  channelsSubscribed: SubscribedChannel[];
-  articlesSaved: ArticleSaved[];
-  radiosLiked: [];
+  defaultArticleCategorie: number;
+  categorie: { id: number; name: string };
+  // channelsSubscribed: SubscribedChannel[];
+  // articlesSaved: ArticleSaved[];
+  // radiosLiked: [];
 }
 
 export interface Article {
@@ -42,8 +43,6 @@ export interface ArticleContent {
 export interface ArticleCategory {
   id: number;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface ArticleSaved {
@@ -60,11 +59,10 @@ export interface Channel {
   webSite: string;
   country: string;
   language: string;
-  liked: boolean;
-  isActive: boolean;
+  sources: {
+    categorieId: number;
+  }[];
   isSubscribed?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface SubscribedChannel {
@@ -130,15 +128,6 @@ export interface SuccessVerify {
   session: string;
 }
 
-export interface TrackPlaylist {
-  id: number;
-  title: string;
-  artist: string;
-  artwork: string;
-  url: string;
-  isLiveStream: boolean;
-}
-
 export interface AverageColor {
   success: boolean;
   color?: {
@@ -153,14 +142,14 @@ export interface AverageColor {
   message?: string;
 }
 
-export interface TopNews {
-  title: string;
-  source: {
-    name: string;
-    icon: string;
-    authors?: string[];
-  };
-  link: string;
-  thumbnail: string;
-  date: string;
-}
+// export interface TopNewsInterface {
+//   title: string;
+//   source: {
+//     name: string;
+//     icon: string;
+//     authors?: string[];
+//   };
+//   link: string;
+//   thumbnail: string;
+//   date: string;
+// }

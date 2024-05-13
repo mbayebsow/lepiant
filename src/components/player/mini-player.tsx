@@ -7,18 +7,26 @@ import useStyles from "../../hook/useStyle";
 import usePlayerStore from "../../hook/usePlayer";
 import { Event, useTrackPlayerEvents } from "react-native-track-player";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useMemo } from "react";
 
 const MiniPlayer = () => {
-  const currentSong = usePlayerStore((state) => state.currentSong);
-  const averageColor = usePlayerStore((state) => state.averageColor);
-  const setStatus = usePlayerStore((state) => state.setStatus);
+  const currentSong = usePlayerStore(state => state.currentSong);
+  const averageColor = usePlayerStore(state => state.averageColor);
+  const setCurrentSong = usePlayerStore(state => state.setCurrentSong);
+  const updateAverageColor = usePlayerStore(state => state.updateAverageColor);
+  const setStatus = usePlayerStore(state => state.setStatus);
+  const handleNext = usePlayerStore(state => state.handleNext);
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { backgroundColorLight } = useStyles();
 
   useTrackPlayerEvents(
     [Event.PlaybackQueueEnded, Event.PlaybackActiveTrackChanged, Event.PlaybackState],
-    async (event) => {
+    async event => {
       if (event.type === "playback-state") {
+        if (event.state === "error") handleNext();
+        if (event.state === "playing") setStatus(3);
+        if (event.state === "none") setStatus(4);
+
         if (event.state === "loading" || event.state === "buffering") setStatus(1);
         if (
           event.state === "ready" ||
@@ -27,10 +35,13 @@ const MiniPlayer = () => {
           event.state === "ended"
         )
           setStatus(2);
-        if (event.state === "playing") setStatus(3);
-        if (event.state === "none" || event.state === "error") setStatus(4);
       }
-    }
+      if (event.type === "playback-active-track-changed") {
+        if (event.track) {
+          setCurrentSong(event.track);
+        }
+      }
+    },
   );
 
   return (
@@ -45,8 +56,7 @@ const MiniPlayer = () => {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-        }}
-      >
+        }}>
         <Pressable
           onPress={() => navigation.navigate("Player")}
           style={{
@@ -55,8 +65,7 @@ const MiniPlayer = () => {
             alignItems: "center",
             gap: 10,
             width: "80%",
-          }}
-        >
+          }}>
           <PlayerCover />
           <PlayerName />
         </Pressable>
