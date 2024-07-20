@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      Int                  @id @default(autoincrement())
+  email                   String               @unique
+  firstName               String
+  lastName                String
+  avatar                  String?              @default("https://ik.imagekit.io/7whoa8vo6/lepiant/avatars/a388a057fd087204dd4b5cd90b79f54c-sticker%201__Npxb9iIU.png")
+  language                String?              @default("fr")
+  country                 String?              @default("sn")
+  isActive                Boolean?             @default(true)
+  allowNotifications      Boolean?             @default(true)
+  role                    Role?                @default(USER)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  defaultStartedPage      Startpage?           @default(News)
+  defaultArticleCategorie Int?                 @default(1)
+  password                String?
+  articlesSaved           Article_saved[]
+  channelsSubscribed      Channel_subscribed[]
+  radiosLiked             Radio_liked[]
+  sessions                Session[]
+  categorie               Article_categorie?   @relation(fields: [defaultArticleCategorie], references: [id])
+}
+
+model Article {
+  id          Int               @id @default(autoincrement())
+  categorieId Int
+  channelId   Int
+  title       String            @unique
+  image       String            @default("https://ik.imagekit.io/7whoa8vo6/lepiant/a6a6a6_text=L_27EPIANT_LxvtvPYyB")
+  description String
+  link        String            @unique
+  isActive    Boolean?          @default(true)
+  published   DateTime
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  categorie   Article_categorie @relation(fields: [categorieId], references: [id])
+  channel     Channel           @relation(fields: [channelId], references: [id])
+  seved       Article_saved[]
+}
+
+model Article_categorie {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  articles  Article[]
+  sourcess  Source[]
+  users     User[]
+}
+
+model Article_saved {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Channel {
+  id         Int                  @id @default(autoincrement())
+  name       String               @unique
+  logo       String
+  fullLogo   String
+  country    String
+  language   String               @default("fr")
+  isActive   Boolean              @default(true)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  webSite    String
+  articles   Article[]
+  subscribed Channel_subscribed[]
+  sources    Source[]
+}
+
+model Channel_subscribed {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  channelId Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Radio {
+  id          Int             @id @default(autoincrement())
+  name        String          @unique
+  source      String
+  image       String
+  isActive    Boolean         @default(true)
+  categorieId Int
+  categorie   Radio_categorie @relation(fields: [categorieId], references: [id])
+  liked       Radio_liked[]
+}
+
+model Radio_liked {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  radioId Int
+  radio   Radio @relation(fields: [radioId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
+}
+
+model Radio_categorie {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  radio     Radio[]
+}
+
+model Source {
+  id          Int               @id @default(autoincrement())
+  categorieId Int
+  channelId   Int
+  url         String
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  language    String            @default("fr")
+  categorie   Article_categorie @relation(fields: [categorieId], references: [id])
+  channel     Channel           @relation(fields: [channelId], references: [id])
+}
+
+model Quotidien {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  images       String   @unique
+  publishedAt  String
+  thumbnailUrl String   @default("")
+}
+
+model Revue {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  audio       String
+  name        String   @unique
+  publishedAt String
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  sessionKey   String   @unique
+  sessionData  String
+  userAgent    String
+  lastActivity DateTime
+  createAt     DateTime
+  expireAt     DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+enum Startpage {
+  News
+  Radios
+}
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+  GUEST
+  CRONAGENT
+}

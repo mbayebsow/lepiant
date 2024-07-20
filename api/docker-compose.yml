@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  app:
+    build: ./
+    container_name: "lepiant-api"
+    restart: "always"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "db"
+      - "cache"
+    links:
+      - "db"
+      - "cache"
+    environment:
+      NODE_ENV: "development"
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres?schema=public"
+      REDIS_URL: "rediss://redis:redis@cache:6379"
+
+  db:
+    image: "postgres:latest"
+    ports:
+      - "5432:5432"
+    restart: "always"
+    shm_size: "128mb"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - "db:/var/lib/postgresql/data"
+
+  cache:
+    image: "redis:latest"
+    restart: "always"
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PASSWORD: "redis"
+      Redis_user: "redis"
+    volumes:
+      - "cache:/data"
+
+volumes:
+  cache:
+    driver: local
+  db:
+    driver: local

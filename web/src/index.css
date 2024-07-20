@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+  }
+}
+
+html {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  -webkit-user-select: none !important;
+}
+html::-webkit-scrollbar {
+  display: none !important;
+}
+
+h1 {
+  font-size: large;
+  font-weight: bold;
+}
+h2 {
+  font-size: medium;
+  font-weight: bold;
+}
+p {
+  font-size: small;
+}
+p {
+  margin-bottom: 0.9rem;
+}
+br {
+  display: none;
+}
+.blog-content a,
+.blog-content span,
+.blog-content blockquote,
+.blog-content img {
+  display: none !important;
+}
+
+.swiper-pagination.swiper-pagination-clickable.swiper-pagination-bullets.swiper-pagination-horizontal {
+  bottom: -3px;
+}
+span.swiper-pagination-bullet {
+  width: 5px;
+  height: 5px;
+}
+
+.avatar-selecter > .swiper-wrapper {
+  align-items: center;
+  gap: 14px;
+}
+.avatar-swiper {
+  width: 22vw !important;
+  height: 22vw !important;
+}
+.swiper-slide-shadow-right,
+.swiper-slide-shadow-left {
+  background: none !important;
+  display: none;
+}
+.avatar-swiper.swiper-slide-active {
+  border: 3px red solid;
+  border-radius: 100%;
+  padding: 4px;
+}
+.text-size-popover {
+  --width: 300px !important;
+}
+ion-button.button-solid {
+  --background: linear-gradient(34deg, rgba(220, 0, 0, 1) 63%, rgba(255, 122, 0, 1) 100%);
+}

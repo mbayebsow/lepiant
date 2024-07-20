@@ -1,0 +1,9 @@
+{
+  "appId": "com.lepiant.teldoo",
+  "appName": "L'épiant",
+  "webDir": "dist",
+  "bundledWebRuntime": true,
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "L'épiant",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

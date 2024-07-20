@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=development node --watch src/index.js",
+    "test": "NODE_ENV=test node src/test.js",
+    "pm2Start": "pm2 start --name lepiant:content-creator-agent src/index.js && pm2 save",
+    "pm2Stop": "pm2 stop lepiant:content-creator-agent && pm2 save"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.3.2",
+    "dotenv": "^16.3.1",
+    "hono": "^3.11.4",
+    "node-schedule": "^2.1.1",
+    "node-telegram-bot-api": "^0.64.0",
+    "redis": "^4.6.11",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "supabase": "^1.115.5"
+  }
+}
