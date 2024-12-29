@@ -2,6 +2,7 @@ version: "3.8"
 services:
   jobs:
     build: ./jobs
+    container_name: lepiant-bot
     # ports:
     #   - "8080:8080"
     # volumes:

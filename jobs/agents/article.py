@@ -278,17 +278,16 @@ async def articles_job():
         saved_summary_table.add_row("Nombre total enregistrés", str(saved_summary["total_saved"]))
         saved_summary_table.add_row("Nombre total d'erreurs", str(saved_summary["total_error"]))
 
-        logger.info(f"processed_summary: {processed_summary}")
-        logger.info(f"saved_summary: {saved_summary}")
+        job_summary = {
+            "processed_summary": processed_summary,
+            "saved_summary": saved_summary,
+        }
 
+        logger.info(f"job_summary: {job_summary}")
         console.print(processed_summary_table)
         console.print(saved_summary_table)
 
-        log = open(log_path, 'r')
-        logs = log.read()
-        log.close()
-
-        monitor.ping(state='complete', message=logs)
+        monitor.ping(state='complete', message=str(job_summary))
 
     except Exception as e:
         logger.error(f"[bold red]Erreur dans le job d'articles: {str(e)}")

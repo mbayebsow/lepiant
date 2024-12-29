@@ -259,11 +259,8 @@ async def newspaper_job():
             logger.info(f"saved_summary: {saved_summary}")
             console.print(saved_summary_table)
 
-            log = open(log_path, 'r')
-            logs = log.read()
-            log.close()
 
-            monitor.ping(state='complete', message=logs)
+            monitor.ping(state='complete', message=saved_summary)
     except Exception as e:
         logger.error(f"Erreur dans le job de journaux: {str(e)}[/]")
         monitor.ping(state='fail', message=str(e))

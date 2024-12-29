@@ -1,3 +1,4 @@
+from datetime import datetime
 import schedule
 import time
 import asyncio
@@ -16,7 +17,7 @@ monitor = cronitor.Monitor('lepiant-bot')
 
 def heartbeat():
     monitor.ping(message="Alive!")
-    logger.info("Alive!")
+    logger.info(f"Alive! | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 def run(job_func):
     job_thread = threading.Thread(target=asyncio.run, args=(job_func(),))
