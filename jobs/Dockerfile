@@ -1,20 +1,17 @@
-# Base image
-FROM node:18
+FROM python:3.9-slim
 
-# Create app directory
-WORKDIR /usr/src/app
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+    
+WORKDIR /app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+COPY requirements.txt .
 
-# Install app dependencies
-RUN npm install
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Bundle app source
 COPY . .
 
-# Start the server using the production build
-CMD [ "node", "index.js" ]
+# EXPOSE 8000
 
-# Exposing server port
-EXPOSE 8787
+CMD ["python", "job.py"]

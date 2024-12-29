@@ -1,0 +1,16 @@
+[Unit]
+Description=Mon job Python
+After=network.target
+
+[Service]
+User=utilisateur
+Group=utilisateur
+WorkingDirectory=/chemin/vers/jobs
+ExecStart=/usr/bin/python3 /chemin/vers/jobs/job.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/chemin/vers/logs/job.log
+StandardError=append:/chemin/vers/logs/job.log
+
+[Install]
+WantedBy=multi-user.target
