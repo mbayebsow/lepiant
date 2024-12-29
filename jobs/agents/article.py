@@ -19,7 +19,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import common.models as models
 from common.database import engine, SessionLocal
 from common.config import Config
-from utils.webpage_parser import get_html
+# from utils.webpage_parser import get_html
+from utils.webpage_parser import HTTPClientWithRetryAndRedirect
 
 console = Console()
 log_name = datetime.now()
@@ -50,6 +51,13 @@ redis_client = redis.Redis(
         decode_responses=True
     )
 
+http_client = HTTPClientWithRetryAndRedirect(
+        max_retries=3,
+        initial_delay=1.0,
+        max_delay=5.0,
+        backoff_factor=2.0
+    )
+
 models.Base.metadata.create_all(bind=engine)
 session = SessionLocal()
 
@@ -69,7 +77,7 @@ async def sleep(millis):
 
 async def get_article_image(url):
     try:
-        html = get_html(url)
+        html = http_client.get_html(url)
         if html:
             soup = BeautifulSoup(html, 'html.parser')
             # Chercher d'abord l'image og:image
@@ -84,10 +92,9 @@ async def get_article_image(url):
             for img in images:
                 src = img.get('src', '')
                 if src and is_valid_url(src) and not src.endswith(('.gif', '.svg')):
-                    return src, True
-                    
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Erreur lors de la récupération de l'image pour {url}: {str(e)}")
+                    return src, True                
+    # except requests.exceptions.RequestException as e:
+    #     logger.error(f"Erreur lors de la récupération de l'image pour {url}: {str(e)}")
     except Exception as e:
         logger.error(f"Erreur inattendue lors de la récupération de l'image pour {url}: {str(e)}")
         
@@ -263,20 +270,7 @@ async def articles_job():
                 
         saved_summary = await save_articles_to_db(processed_articles)
 
-        processed_summary_table = Table(title="Résumé du traitement")
-        processed_summary_table.add_column("Champ", style="cyan", no_wrap=True)
-        processed_summary_table.add_column("Valeur", style="magenta")
-        processed_summary_table.add_row("Nombre total d'articles", str(processed_summary["total_article"]))
-        processed_summary_table.add_row("Nombre total enregistrés", str(processed_summary["total_saved"]))
-        processed_summary_table.add_row("Nombre total ignorés", str(processed_summary["total_skipped"]))
-        processed_summary_table.add_row("Nombre total d'erreurs", str(processed_summary["total_error"]))
-
-        saved_summary_table = Table(title="Résumé de l'enregistrement")
-        saved_summary_table.add_column("Champ", style="cyan", no_wrap=True)
-        saved_summary_table.add_column("Valeur", style="magenta")
-        saved_summary_table.add_row("Nombre total d'articles", str(saved_summary["total_article"]))
-        saved_summary_table.add_row("Nombre total enregistrés", str(saved_summary["total_saved"]))
-        saved_summary_table.add_row("Nombre total d'erreurs", str(saved_summary["total_error"]))
+        monitor.ping(state='complete', message="Job terminé avec succès")
 
         job_summary = {
             "processed_summary": processed_summary,
@@ -284,13 +278,9 @@ async def articles_job():
         }
 
         logger.info(f"job_summary: {job_summary}")
-        console.print(processed_summary_table)
-        console.print(saved_summary_table)
-
-        monitor.ping(state='complete', message=str(job_summary))
 
     except Exception as e:
-        logger.error(f"[bold red]Erreur dans le job d'articles: {str(e)}")
+        logger.error(f"Erreur dans le job d'articles: {str(e)}")
         monitor.ping(state='fail', message=str(e))
 
 
