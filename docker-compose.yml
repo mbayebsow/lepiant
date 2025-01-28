@@ -1,12 +1,7 @@
 version: "3.8"
 services:
-  jobs:
-    build: ./jobs
-    container_name: lepiant-bot
-    # ports:
-    #   - "8080:8080"
-    # volumes:
-    #   - ./jobs:/app
+  worker:
+    build: ./workers
     restart: always
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -26,3 +21,69 @@ services:
       - PRESS_REVIEW_PATH=${PRESS_REVIEW_PATH}
       - NEWSPAPER_PATH=${NEWSPAPER_PATH}
       - CRONITOR_API_KEY=${CRONITOR_API_KEY}
+  api:
+    build: ./api
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_SSL=${REDIS_SSL}
+      - REDIS_URL=${REDIS_URL}
+    # depends_on:
+    #   - postgres
+    #   - redis
+
+  # postgres:
+  #   image: postgres:14
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_PASSWORD: pass
+
+  # redis:
+  #   image: redis:6
+  #   volumes:
+  #     - redisdata:/data
+
+  nginx:
+    image: nginx:1.21
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+
+  worker:
+    build: .
+    restart: always
+    command: rq worker -u ${REDIS_URL} #redis://redis:6379
+    # depends_on:
+    #   - redis
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+
+  elk:
+    image: sebp/elk
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+# volumes:
+#   pgdata:
+#   redisdata:

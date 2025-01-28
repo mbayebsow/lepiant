@@ -3,6 +3,7 @@
 *./eslintcache
 
 *.venv
+.venv
 *.env
 */.env.development.local
 */.env.test.local
@@ -25,3 +26,6 @@ web/ios
 *logs
 processed_articles.txt
 #web/dist
+*/node_modules
+*/Pods
+*/vendor
