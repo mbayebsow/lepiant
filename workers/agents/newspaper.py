@@ -17,6 +17,7 @@ from rich.table import Table
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.upload_to_cloudinary import upload_to_cloudinary
 from utils.webpage_parser import get_html
+from utils.webpage_parser import HTTPClientWithRetryAndRedirect
 import common.models as models
 from common.database import engine, SessionLocal
 from common.models import Newspapers
@@ -38,6 +39,13 @@ logging.basicConfig(
         logging.FileHandler(log_path)
     ]
 )
+http_client = HTTPClientWithRetryAndRedirect(
+        max_retries=3,
+        initial_delay=1.0,
+        max_delay=5.0,
+        backoff_factor=2.0
+    )
+
 logger = logging.getLogger(__name__)
 
 NEWSPAPERS = []
@@ -134,15 +142,15 @@ async def saved_newspapers_to_db(newspapers):
     return saved_summary
 
 
-async def get_html_code(url):
-    logger.info(f"Recuperation du code HTML depuis {url}")
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.text
-    except Exception as error:
-        logger.error(f"Erreur lors de l'obstention du code HTML {error}")
-        return None
+# async def get_html_code(url):
+#     logger.info(f"Recuperation du code HTML depuis {url}")
+#     try:
+#         response = requests.get(url)
+#         response.raise_for_status()
+#         return response.text
+#     except Exception as error:
+#         logger.error(f"Erreur lors de l'obstention du code HTML {error}")
+#         return None
 
 
 async def extract_images_from_html(html_code):
@@ -203,14 +211,14 @@ async def newspaper_job():
             time.sleep(1800) # Sleep for 30 minutes
             await newspaper_job()
         else:
-            html_code = get_html(last_post["link"]) #await get_html_code(last_post["link"])
+            html_code = http_client.get_html(last_post["link"]) #await get_html_code(last_post["link"])
             if not html_code:
-                monitor.ping(state='complete', message='Aucun dernier post')
+                monitor.ping(state='fail', message='Aucun dernier post')
                 return
 
             images_extracted = await extract_images_from_html(html_code)
             if not images_extracted:
-                monitor.ping(state='complete', message='Aucun dernier post')
+                monitor.ping(state='fail', message='Aucun dernier post')
                 return
 
             collected_nesspapers_urls = []
@@ -248,19 +256,9 @@ async def newspaper_job():
                 return
 
             saved_summary = await saved_newspapers_to_db(collected_nesspapers_urls)
-
-            saved_summary_table = Table(title="Résumé de l'enregistrement")
-            saved_summary_table.add_column("Champ", style="cyan", no_wrap=True)
-            saved_summary_table.add_column("Valeur", style="magenta")
-            saved_summary_table.add_row("Nombre total d'images", str(saved_summary["total_newspaper"]))
-            saved_summary_table.add_row("Nombre total enregistrés", str(saved_summary["total_saved"]))
-            saved_summary_table.add_row("Nombre total d'erreurs", str(saved_summary["total_error"]))
+            monitor.ping(state='complete', message="Job terminé avec succès")
 
             logger.info(f"saved_summary: {saved_summary}")
-            console.print(saved_summary_table)
-
-
-            monitor.ping(state='complete', message=saved_summary)
     except Exception as e:
         logger.error(f"Erreur dans le job de journaux: {str(e)}[/]")
         monitor.ping(state='fail', message=str(e))

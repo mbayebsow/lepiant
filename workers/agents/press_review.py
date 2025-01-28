@@ -404,7 +404,7 @@ async def press_review_job():
 
             logger.info("Press review job terminée!")
             # sys.exit(0)
-            monitor.ping(state='complete', message='Press review job terminée!')
+            monitor.ping(state='complete', message='Job terminé avec succès')
             break
 
         except Exception as e:
